@@ -79,7 +79,7 @@ describe('User Controller', () => {
     });
   });
 
-  describe("POST /api/user/register", () => {
+  describe("POST /api/users/register", () => {
     it("deve retornar 400 se campos obrigatórios estiverem faltando", async () => {
       const response = await request(app)
         .post("/api/users/register")
