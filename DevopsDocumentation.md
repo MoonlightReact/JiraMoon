@@ -9,7 +9,7 @@ Este repositório **não contém regra de negócio nem schema de banco**. O cód
 ## Subindo o ambiente
 
 1. **Variáveis:** copie `.example.env` para `.env` e preencha.
-2. **Host local:** adicione `127.0.0.1 moonlight.local` ao arquivo de hosts do sistema.
+2. **Host local:** adicione `127.0.0.1 moonlight.local` ao arquivo de hosts do sistema (**via Linux:** `/etc/hosts` | **via Windows:** `C:\Windows\System32\drivers\etc\hosts`).
 3. **Certificados:** os arquivos `nginx/certs/moonlight.local.pem` e `moonlight.local-key.pem` precisam existir. Se não existirem:
    ```bash
    mkcert -install
