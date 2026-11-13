@@ -1,10 +1,9 @@
-import type { Pool, PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
+import type { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import pool from "@shared/config/database.js";
-import type { UserCountRows, UserRoleVersionRow, UserRow, UserRowWithPassword } from "../@types/user/repository/user.row.js";
-import type { CreateUserDTO, UpdateMeDTO, UpdateUserDTO } from "../@types/user/dto/user.input.dto.js";
-import type { UserWithoutPassword, UserWithPassword } from "../@types/user/repository/user.repository.js";
+import type { UserCountRows, UserRoleVersionRow, UserRow, UserRowWithPassword } from "@modules/user/user.row.js";
+import type { RegisterUserDTO, CreateUserDTO, UpdateMeDTO, UpdateUserDTO } from "@modules/user/dto/user.input.dto.js";
+import type { UserWithoutPassword, UserWithPassword } from "@modules/user/user.repository.types.js";
 import type { FilterParams, QueryOptions } from "@shared/types/pagination.js";
-import type { RegisterAuthDTO } from "../@types/auth/auth.dto.js";
 
 export class UserRepository{
 
@@ -59,7 +58,7 @@ export class UserRepository{
         return rows[0] ?? null;
     }
 
-    async create(query: CreateUserDTO | RegisterAuthDTO, connection?: PoolConnection): Promise<number>{
+    async create(query: CreateUserDTO | RegisterUserDTO, connection?: PoolConnection): Promise<number>{
         const db = connection ?? pool;
         const [result] = await db.query<ResultSetHeader>(
             'INSERT INTO user (name, email, password, cpf) VALUES (?, ?, ?, ?)',

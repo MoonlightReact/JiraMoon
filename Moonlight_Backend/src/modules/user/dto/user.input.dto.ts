@@ -3,7 +3,6 @@
  */
 
 import type { PaginatedQuery } from "@shared/types/pagination.js";
-import type { RoleName } from "../../role/role.types.js";
 
 export type CreateUserDTO = {
   name: string;
@@ -29,6 +28,12 @@ export type UpdateMeDTO = {
   cpf: string;
 };
 
+export type RegisterUserDTO = {
+    name: string,
+    email: string,
+    password: string,
+    cpf: string
+}
 
 
 export interface GetUsersPaginatedDTO extends PaginatedQuery {

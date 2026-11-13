@@ -1,16 +1,11 @@
 import type { CreateOrderDTO, UpdateOrderDTO } from "../@types/order/dto/order.input.dto.js";
 import { AppError } from "@shared/errors/AppError.js";
 import { isPriceValid } from "../utils/Validators/isPriceValid.js";
+import { assertRequiredFields } from "@shared/validator/common.validator.js";
 type validOrderStatus = "pending" | "approved" | "canceled";
 
     const isOrderStatusValid = (type: string): type is validOrderStatus => {
         return ['pending', 'approved', 'canceled'].includes(type as validOrderStatus);
-    }
-
-    export const assertRequiredFields = (fields: unknown[]): void => {
-        if (fields.some(field => field == null || (typeof field === 'string' && !field.trim()))) 
-        throw new AppError("Campos inválidos de Create ou Update de Pedido", 400, "INVALID_FIELDS");
-        // o ultimo caso é pra evitar de mandarem ' '.
     }
 
     const assertTotalPrice = (totalPrice: number): void => {

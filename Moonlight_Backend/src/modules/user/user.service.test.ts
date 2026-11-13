@@ -1,19 +1,19 @@
 import { jest } from "@jest/globals";
-import type { UserRepository } from "../../repositories/UserRepository.js";
+import type { UserRepository } from "@modules/user/user.repository.js";
 import type {
   QueryOptions,
   FilterParams,
 } from "@shared/types/pagination.js";
-import type { UserWithoutPassword } from "../../@types/user/repository/user.repository.js";
+import type { UserWithoutPassword } from "@modules/user/user.repository.types.js";
 import type {
   CreateUserDTO,
   UpdateUserDTO,
   UpdateMeDTO,
   GetUsersPaginatedDTO,
-} from "../../@types/user/dto/user.input.dto.js";
-import type { RegisterAuthDTO } from "../../@types/auth/auth.dto.js";
-import type { UserRoleRepository } from "../../repositories/UserRoleRepository.js";
-import type { RoleService } from "../../services/role.Service.js";
+  RegisterUserDTO
+} from "@modules/user/dto/user.input.dto.js";
+import type { UserRoleRepository } from "@modules/user/role/user-role.repository.js";
+import type { RoleService } from "@modules/user/role/role.service.js";
 import type { Pool, PoolConnection } from "mysql2/promise";
 
 jest.unstable_mockModule("bcryptjs", () => ({
@@ -300,7 +300,7 @@ describe("UserService - Unitário", () => {
   });
 
   describe("register", () => {
-    const registerPayload: RegisterAuthDTO = {
+    const registerPayload: RegisterUserDTO = {
       name: "Maria",
       email: "maria@email.com",
       password: VALID_PASSWORD,

@@ -1,11 +1,10 @@
 import type { NextFunction, Request, Response } from 'express';
 import type { AuthService } from '../services/auth.Service.js';
-import type { UserService } from '../services/user.Service.js';
-import type { LoginAuthDTO, RegisterAuthDTO } from '../@types/auth/auth.dto.js';
+import type { LoginAuthDTO } from '../@types/auth/auth.input.dto.js';
 
 export class AuthController {
 
-    constructor(private authService: AuthService, private userService: UserService){
+    constructor(private authService: AuthService){
     }
 
     login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -23,16 +22,4 @@ export class AuthController {
           next(error);
       }
     };
-
-    registerUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-      try {
-        const dto = req.body as RegisterAuthDTO;
-
-        await this.userService.register(dto);
-
-       res.status(201).json({ message: 'Usuário registrado com sucesso!'});
-      } catch (error) {
-        next(error);
-      }
-  };
 }

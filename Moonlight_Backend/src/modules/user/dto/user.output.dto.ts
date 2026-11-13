@@ -2,7 +2,7 @@
  * DTO DE SAIDA POR QUERY
  */
 
-import type { RoleName } from "../../role/role.types.js";
+import type { RoleName } from "@modules/user/role/role.types.js";
 
 export type UserResponseDTO = {
   id_user: number;

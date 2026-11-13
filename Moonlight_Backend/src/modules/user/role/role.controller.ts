@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from 'express';
-import type { RoleService } from '../services/role.Service.js';
+import type { RoleService } from '@modules/user/role/role.service.js';
 import { toInt } from '@shared/query/queryParser.js';
 import { AppError } from '@shared/errors/AppError.js';
 

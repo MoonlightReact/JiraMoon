@@ -1,9 +1,9 @@
-import type { UserService } from '../services/user.Service.js';
+import type { UserService } from '@modules/user/user.service.js';
 import type { NextFunction, Request, Response } from 'express';
-import type { CreateUserDTO, GetUsersPaginatedDTO, UpdateMeDTO, UpdateUserDTO } from '../@types/user/dto/user.input.dto.js';
+import type { CreateUserDTO, RegisterUserDTO, UpdateMeDTO, UpdateUserDTO } from '@modules/user/dto/user.input.dto.js';
 import { AppError } from '@shared/errors/AppError.js';
 import { toInt } from '@shared/query/queryParser.js';
-import { parseUserQuery } from '../query/parsers/userParser.js';
+import { parseUserQuery } from '@modules/user/user.parser.js';
 
 
 export class UserController{
@@ -57,6 +57,18 @@ export class UserController{
       await this.userService.create(dto);
 
       res.status(201).json({ message: 'Usuário criado com sucesso!'});
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  registerUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const dto = req.body as RegisterUserDTO;
+
+      await this.userService.register(dto);
+
+     res.status(201).json({ message: 'Usuário registrado com sucesso!'});
     } catch (error) {
       next(error);
     }

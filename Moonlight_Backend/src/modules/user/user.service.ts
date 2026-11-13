@@ -1,15 +1,14 @@
 import type { PaginatedResponse } from '@shared/types/pagination.js';
 import bcrypt from 'bcryptjs';
-import type { RegisterAuthDTO } from '../@types/auth/auth.dto.js';
-import { UserRepository } from '../repositories/UserRepository.js';
-import type { CreateUserDTO, GetUsersPaginatedDTO, UpdateMeDTO, UpdateUserDTO } from '../@types/user/dto/user.input.dto.js';
-import type { UserResponseDTO } from '../@types/user/dto/user.output.dto.js';
+import { UserRepository } from '@modules/user/user.repository.js';
+import type { CreateUserDTO, RegisterUserDTO, GetUsersPaginatedDTO, UpdateMeDTO, UpdateUserDTO } from '@modules/user/dto/user.input.dto.js';
+import type { UserResponseDTO } from '@modules/user/dto/user.output.dto.js';
 import { buildSqlFilters } from '@shared/query/sqlFilterBuilder.js';
-import { userFilterConfig } from '../query/filters/userFilterConfig.js';
+import { userFilterConfig } from '@modules/user/user.filter.js';
 import { AppError } from '@shared/errors/AppError.js';
-import { validateRegister, validateUpdateMe, validateUser } from '../validators/user.validator.js';
-import type { UserRoleRepository } from '../repositories/UserRoleRepository.js';
-import type { RoleService } from './role.Service.js';
+import { validateRegister, validateUpdateMe, validateUser } from '@modules/user/user.validator.js';
+import type { UserRoleRepository } from '@modules/user/role/user-role.repository.js';
+import type { RoleService } from '@modules/user/role/role.service.js';
 import type { Pool } from 'mysql2/promise';
 
 export class UserService {
@@ -95,7 +94,7 @@ export class UserService {
     return this.userRepository.delete(id_user);
   }
 
-  async register(dto: RegisterAuthDTO): Promise<number>{ // registro que o cliente pode fazer
+  async register(dto: RegisterUserDTO): Promise<number>{ // registro que o cliente pode fazer
     const connection = await this.pool.getConnection();
     await connection.beginTransaction();
     try {

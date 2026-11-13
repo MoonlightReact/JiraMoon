@@ -1,5 +1,5 @@
-import type { Role } from "../@types/role/repository/role.repository.js";
-import type { RoleRow } from "../@types/role/repository/role.row.js";
+import type { Role } from "@modules/user/role/role.repository.types.js";
+import type { RoleRow } from "@modules/user/role/role.row.js";
 import pool from "@shared/config/database.js";
 
 

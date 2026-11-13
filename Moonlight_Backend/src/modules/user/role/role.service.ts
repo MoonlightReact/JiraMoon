@@ -1,9 +1,9 @@
 import type { PoolConnection } from "mysql2/promise";
-import type { RoleResponseDTO } from "../@types/role/role.dto.js";
+import type { RoleResponseDTO } from "@modules/user/role/role.dto.js";
 import pool from "@shared/config/database.js";
-import type { RoleRepository } from "../repositories/RoleRepository.js";
-import type { UserRepository } from "../repositories/UserRepository.js";
-import type { UserRoleRepository } from "../repositories/UserRoleRepository.js";
+import type { RoleRepository } from "@modules/user/role/role.repository.js";
+import type { UserRepository } from "@modules/user/user.repository.js";
+import type { UserRoleRepository } from "@modules/user/role/user-role.repository.js";
 
 export class RoleService{
 

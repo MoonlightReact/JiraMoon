@@ -62,7 +62,7 @@ describe("Game Controller", () => {
         .send({ title: "Sem preco" });
       expect(res.statusCode).toBe(400);
       expect(res.body.message).toBe(
-        "Campos inválidos de Create ou Update de Jogo",
+        "Todos os campos são obrigatórios",
       );
     });
 
