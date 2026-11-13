@@ -79,6 +79,42 @@ describe('User Controller', () => {
     });
   });
 
+  describe("POST /api/user/register", () => {
+    it("deve retornar 400 se campos obrigatórios estiverem faltando", async () => {
+      const response = await request(app)
+        .post("/api/users/register")
+        .send({ name: "Incompleto" });
+      expect(response.status).toBe(400);
+      expect(response.body.message).toBe("Todos os campos são obrigatórios");
+    });
+
+    it("deve retornar 201 ao cadastrar usuário válido", async () => {
+      const uniqueEmail = `teste${Date.now()}@email.com`;
+      const mockUser = {
+        name: "Fulano",
+        email: uniqueEmail,
+        password: "Password123!",
+        cpf: "529.982.247-25",
+      };
+      const response = await request(app)
+        .post("/api/users/register")
+        .send(mockUser);
+      expect(response.status).toBe(201);
+      expect(response.body.message).toBe("Usuário registrado com sucesso!");
+
+      // busca pelo email para capturar o id e deletar.
+      const listRes = await request(app)
+        .get(`/api/users/pag?email=${encodeURIComponent(uniqueEmail)}`)
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      createdUserId = listRes.body.data[0].id_user;
+
+      await request(app)
+        .delete(`/api/users/${createdUserId}`)
+        .set('Authorization', `Bearer ${adminToken}`);
+    });
+  });
+
   describe('POST /api/users/', () => {
     it('deve criar usuário com sucesso e capturar id para próximos testes', async () => {
       const uniqueEmail = `teste${Date.now()}@email.com`;

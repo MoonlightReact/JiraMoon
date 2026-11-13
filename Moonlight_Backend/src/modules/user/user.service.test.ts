@@ -24,7 +24,7 @@ jest.unstable_mockModule("bcryptjs", () => ({
   },
 }));
 
-const { UserService } = await import("../../services/user.Service.js");
+const { UserService } = await import("./user.service.js");
 
 const mockUserRepository = {
   findAllPaginated:
