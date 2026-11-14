@@ -1,4 +1,4 @@
-import type { RoleName } from "@modules/user/role/role.types.js";
+import type { RoleName } from "@shared/types/role.types.js";
 
 export type UserWithPassword = {
   id_user: number;

@@ -4,7 +4,7 @@
 
 import type { RowDataPacket } from "mysql2";
 import type { UserResponseCountRowsDTO} from "@modules/user/dto/user.output.dto.js";
-import type { RoleName } from "@modules/user/role/role.types.js";
+import type { RoleName } from "@shared/types/role.types.js";
 
 export type UserRow = RowDataPacket & {
   id_user: number;
