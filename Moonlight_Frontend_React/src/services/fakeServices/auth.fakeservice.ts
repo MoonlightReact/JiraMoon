@@ -1,4 +1,3 @@
-
 export async function loginMock(data: {
   email: string;
   password: string;
