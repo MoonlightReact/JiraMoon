@@ -4,7 +4,7 @@ import type { UpdateMeResponseDTO, UserResponseDTO } from "../../@types/user/use
 import type { UpdateMePayload, UserPaginatedQueryPayload, UserPayload } from "../../@types/user/user.payload";
 import { sanitizeData } from "../../utils/sanitizer/sanitizer";
 import { api } from "../api";
-import { createUserMock, fetchUserByIdMock, updateMeMock } from "../fakeServices/user.fakeservice";
+import { createUserMock, fetchUserByIdMock, registerMock, updateMeMock } from "../fakeServices/user.fakeservice";
 
 
 export async function fetchUsersPaginated(query: UserPaginatedQueryPayload): Promise<PaginatedResponse<UserResponseDTO>> {
@@ -43,6 +43,22 @@ export async function deleteUser(id_user: number): Promise<ApiResponse> {
     return response.data;
 }
 
+export async function registerUser(data: {
+  name: string;
+  email: string;
+  cpf: string;
+  password: string;
+}) { /* empacoto os dados em objeto e transformando o objeto em JSON mando pra rota tal em metodo post para o corpo de requisição (req.body) */
+
+    const cleanData = sanitizeData(data);
+
+    if (import.meta.env.VITE_USE_MOCK === "true") {
+        return registerMock(cleanData);
+    }
+
+  const response = await api.post("/api/users/register", cleanData);
+  return response.data;
+}
 
 // /me para edição permitida do usuario
 export async function updateMe(data: UpdateMePayload): Promise<UpdateMeResponseDTO> {
