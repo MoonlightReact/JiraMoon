@@ -9,5 +9,3 @@ export { UserRoleRepository } from "./role/user-role.repository.js";
 export { RoleService } from "./role/role.service.js";
 export { RoleController } from "./role/role.controller.js";
 export { createRoleRoutes } from "./role/role.routes.js";
-
-export type { RoleName } from "@shared/types/role.types.js";

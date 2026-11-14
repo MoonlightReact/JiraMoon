@@ -1,5 +1,5 @@
 import type { RequestHandler } from "express";
-import type { RoleName } from "@modules/user/index.js"
+import type { RoleName } from "@shared/types/role.types.js"
 
 export interface Guards {
   authenticate: RequestHandler;

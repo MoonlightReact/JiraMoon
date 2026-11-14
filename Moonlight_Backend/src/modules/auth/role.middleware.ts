@@ -1,6 +1,6 @@
 import { AppError } from "@shared/errors/AppError.js";
 import type { NextFunction, Request, Response } from "express";
-import type { RoleName } from "@modules/user/index.js";
+import type { RoleName } from "@shared/types/role.types.js";
 
 export function createRoleMiddleware(deps:
   { getRoleVersion: (id_user: number) => Promise<number> }
