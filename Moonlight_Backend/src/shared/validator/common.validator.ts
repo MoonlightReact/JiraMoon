@@ -1,5 +1,16 @@
 import { AppError } from "@shared/errors/AppError.js";
 
+const isPriceValid = (price: unknown): boolean => {
+  if (typeof price === "string" && price.trim() === "") return false;
+
+  const num = Number(price);
+
+  return (
+    Number.isFinite(num) && num >= 0 && Number.isInteger(Math.round(num * 100)) // máximo 2 casas decimais
+  );
+}
+
+
 const isEmailValid = (email: string): boolean => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
@@ -27,4 +38,8 @@ export const assertEmail = (email: string): void => {
 
 export const assertPassword = (password: string): void => {
     if (!isStrongPassword(password)) throw new AppError('Senha deve ter pelo menos 8 a 16 caracteres, maiúscula, minúscula, número', 400, "WEAK_PASSWORD");
+}
+
+export const assertPrice = (price: number): void => {
+    if(!isPriceValid(price)) throw new AppError("O preço é inválido", 400, "INVALID_PRICE");
 }

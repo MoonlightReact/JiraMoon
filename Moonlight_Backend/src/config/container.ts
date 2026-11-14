@@ -1,15 +1,13 @@
 import { CheckoutController } from "../controllers/checkout.Controller.js";
-import { GameController } from "../controllers/game.Controller.js";
 import { OrderController } from "../controllers/order.Controller.js";
 import { UploadController } from "../controllers/upload.Controller.js";
-import { GameRepository } from "../repositories/GameRepository.js";
 import { OrderRepository } from "../repositories/OrderRepository.js";
 import { PurchasedItemsRepository } from "../repositories/PurchasedItemsRepository.js";
 import { CheckoutService } from "../services/checkout.Service.js";
-import { GameService } from "../services/game.Service.js";
 import { OrderService } from "../services/order.Service.js";
 import { PurchasedItemsService } from "../services/purchasedItems.Service.js";
 import { AuthController, AuthService } from "@modules/auth/index.js";
+import { GameController, GameRepository, GameService } from "@modules/game/index.js";
 import { UserController, UserService, UserRepository, RoleController, RoleRepository, RoleService, UserRoleRepository } from "@modules/user/index.js";
 import { CategoryController, CategoryRepository, CategoryService } from "@modules/category/index.js";
 import pool from "@shared/config/database.js";
