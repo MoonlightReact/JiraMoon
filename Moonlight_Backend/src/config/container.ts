@@ -1,25 +1,22 @@
-import { AuthController } from "../controllers/auth.Controller.js";
 import { CheckoutController } from "../controllers/checkout.Controller.js";
 import { GameController } from "../controllers/game.Controller.js";
 import { OrderController } from "../controllers/order.Controller.js";
-import { RoleController } from "../controllers/role.Controller.js";
 import { UploadController } from "../controllers/upload.Controller.js";
-import { UserController } from "../controllers/user.Controller.js";
 import { GameRepository } from "../repositories/GameRepository.js";
 import { OrderRepository } from "../repositories/OrderRepository.js";
 import { PurchasedItemsRepository } from "../repositories/PurchasedItemsRepository.js";
-import { RoleRepository } from "../repositories/RoleRepository.js";
-import { UserRepository } from "../repositories/UserRepository.js";
-import { UserRoleRepository } from "../repositories/UserRoleRepository.js";
-import { AuthService } from "../services/auth.Service.js";
 import { CheckoutService } from "../services/checkout.Service.js";
 import { GameService } from "../services/game.Service.js";
 import { OrderService } from "../services/order.Service.js";
 import { PurchasedItemsService } from "../services/purchasedItems.Service.js";
-import { RoleService } from "../services/role.Service.js";
-import { UserService } from "../services/user.Service.js";
-import pool from "@shared/config/database.js";
+import { AuthController, AuthService } from "@modules/auth/index.js";
+import { UserController, UserService, UserRepository, RoleController, RoleRepository, RoleService, UserRoleRepository } from "@modules/user/index.js";
 import { CategoryController, CategoryRepository, CategoryService } from "@modules/category/index.js";
+import pool from "@shared/config/database.js";
+
+import type { Guards } from "@shared/types/guards.js";
+import { createAuthMiddleware } from "@modules/auth/auth.middleware.js";
+import { createRoleMiddleware } from "@modules/auth/role.middleware.js";
 
 export const userRepository     = new UserRepository();
 const gameRepository     = new GameRepository(pool);
@@ -43,6 +40,11 @@ export const userController     = new UserController(userService);
 export const gameController     = new GameController(gameService);
 export const orderController    = new OrderController(orderService);
 export const categoryController = new CategoryController(categoryService);
-export const authController     = new AuthController(authService, userService);
+export const authController     = new AuthController(authService);
 export const checkoutController = new CheckoutController(checkoutService, orderService);
 export const roleController = new RoleController(roleService);
+
+export const guards: Guards = {
+  authenticate: createAuthMiddleware({ findById: (id_user: number) => userService.findById(id_user) }),
+  authorize: createRoleMiddleware({ getRoleVersion: (id_user: number) => userRepository.getRoleVersion(id_user) })
+}

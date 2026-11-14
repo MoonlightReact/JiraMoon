@@ -3,15 +3,14 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import uploadRoutes from '../routes/upload.Routes.js'
-import userRoutes from '../routes/user.Routes.js';
 import gameRoutes from '../routes/games.Routes.js';
-import authRoutes from '../routes/auth.Routes.js';
 import checkoutRoutes from '../routes/checkout.Routes.js';
 import orderRoutes from '../routes/order.Routes.js';
-import roleRoutes from '../routes/role.Routes.js';
 import { errorMiddleware } from '@shared/middlewares/error.Middleware.js';
-import { categoryController } from '../config/container.js';
+import { authController, categoryController, guards, roleController, userController } from '../config/container.js';
 import { createCategoryRoutes } from '@modules/category/index.js';
+import { createRoleRoutes, createUserRoutes } from '@modules/user/index.js';
+import { createAuthRoutes } from '@modules/auth/index.js';
 
 dotenv.config();
 
@@ -28,11 +27,11 @@ app.get('/', (req, res) => {
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 app.use('/api/uploads', uploadRoutes);
-app.use('/api/auth', authRoutes);
-app.use('/api/roles', roleRoutes);
-app.use('/api/users', userRoutes);
+app.use('/api/auth', createAuthRoutes(authController));
+app.use('/api/roles', createRoleRoutes(roleController, guards));
+app.use('/api/users', createUserRoutes(userController, guards));
 app.use('/api/games', gameRoutes);
-app.use('/api/categories', createCategoryRoutes(categoryController));
+app.use('/api/categories', createCategoryRoutes(categoryController, guards));
 app.use('/api/checkout', checkoutRoutes);
 app.use('/api/orders', orderRoutes);
 app.use(errorMiddleware);

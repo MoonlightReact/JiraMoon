@@ -1,16 +1,15 @@
 import { Router } from 'express';
-import { authMiddleware } from '../../middlewares/auth.Middleware.js';
 import type { CategoryController } from './category.controller.js';
-import { roleMiddleware } from '../../middlewares/role.Middleware.js';
 import { requireAdmin } from '../../config/allowedRoles.js';
+import type { Guards } from '@shared/types/guards.js';
 
-export function createCategoryRoutes(controller: CategoryController): Router {
+export function createCategoryRoutes(controller: CategoryController, guards: Guards): Router {
   const router = Router();
-  router.get('/pag', controller.getCategoriesPaginated); // Usuário Lista as categorias
-  router.get('/:id', controller.getCategoryById); // Usuário Busca a categoria
-  router.get('/', controller.getCategories);  // só pra completar o crud
-  router.post('/', authMiddleware, roleMiddleware(requireAdmin), controller.createCategory); // Admin - Cria categoria
-  router.put('/:id', authMiddleware, roleMiddleware(requireAdmin), controller.updateCategory); // Admin - Atualiza categoria
-  router.delete('/:id', authMiddleware, roleMiddleware(requireAdmin), controller.deleteCategory); // Admin - Deleta categoria
+  router.get('/pag', controller.getCategoriesPaginated);
+  router.get('/:id', controller.getCategoryById);
+  router.get('/', controller.getCategories);
+  router.post('/', guards.authenticate, guards.authorize(requireAdmin), controller.createCategory);
+  router.put('/:id', guards.authenticate, guards.authorize(requireAdmin), controller.updateCategory);
+  router.delete('/:id', guards.authenticate, guards.authorize(requireAdmin), controller.deleteCategory);
   return router;
 }

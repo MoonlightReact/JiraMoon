@@ -1,18 +1,16 @@
 import { Router } from 'express';
-import { authMiddleware } from '../middlewares/auth.Middleware.js';
-import { gameController } from '../config/container.js';
+import { guards, gameController } from "../config/container.js";
 import { errorMiddleware } from '@shared/middlewares/error.Middleware.js';
-import { roleMiddleware } from '../middlewares/role.Middleware.js';
 import { requireAdmin } from '../config/allowedRoles.js';
 
 const router = Router();
 
 router.get('/pag', gameController.getGamesPaginated); // Usuário Lista os jogos
-router.get('/pagadmin', authMiddleware, roleMiddleware(requireAdmin), gameController.getGamesAdminPaginated); // Admin - Lista os jogos
+router.get('/pagadmin', guards.authenticate, guards.authorize(requireAdmin), gameController.getGamesAdminPaginated); // Admin - Lista os jogos
 router.get('/:id', gameController.getGameById); // Usuário Busca o jogo
-router.get('/', authMiddleware, roleMiddleware(requireAdmin), gameController.getGames);  // só pra completar o crud
-router.post('/', authMiddleware, roleMiddleware(requireAdmin), gameController.createGame, errorMiddleware); // Admin - Cria jogo
-router.put('/:id', authMiddleware, roleMiddleware(requireAdmin), gameController.updateGame); // Admin - Atualiza jogo
-router.delete('/:id', authMiddleware, roleMiddleware(requireAdmin), gameController.deleteGame); // Admin - Deleta jogo
+router.get('/', guards.authenticate, guards.authorize(requireAdmin), gameController.getGames);  // só pra completar o crud
+router.post('/', guards.authenticate, guards.authorize(requireAdmin), gameController.createGame, errorMiddleware); // Admin - Cria jogo
+router.put('/:id', guards.authenticate, guards.authorize(requireAdmin), gameController.updateGame); // Admin - Atualiza jogo
+router.delete('/:id', guards.authenticate, guards.authorize (requireAdmin), gameController.deleteGame); // Admin - Deleta jogo
 
 export default router;
