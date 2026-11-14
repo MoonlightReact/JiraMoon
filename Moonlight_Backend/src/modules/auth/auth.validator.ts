@@ -1,5 +1,5 @@
 import { assertEmail, assertPassword, assertRequiredFields } from "@shared/validator/common.validator.js";
-import type { LoginAuthDTO } from "../@types/auth/auth.input.dto.js";
+import type { LoginAuthDTO } from "@modules/auth/dto/auth.input.dto.js";
 
 export const validateLogin = (dto: LoginAuthDTO): void => {
   assertRequiredFields([dto.email, dto.password]);

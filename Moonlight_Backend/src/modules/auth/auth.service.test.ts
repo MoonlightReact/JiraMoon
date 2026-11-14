@@ -1,7 +1,7 @@
 import { jest } from "@jest/globals";
 import type { UserRepository } from "@modules/user/index.js";
 import type { UserWithPassword } from "@modules/user/index.js";
-import type { AuthResponseDTO } from "../../@types/auth/auth.output.dto.js";
+import type { AuthResponseDTO } from "@modules/auth/dto/auth.output.dto.js";
 import type { UserRoleRepository } from "@modules/user/index.js";
 
 jest.unstable_mockModule("bcryptjs", () => ({
@@ -26,7 +26,7 @@ const { default: jwt } = await import("jsonwebtoken");
 // como queremos testar a service, mockamos as funções que nossos métodos usam por baixo.
 // (verifyPassword usa bcrypt.compare, generateToken usa jwt.sign).
 
-const { AuthService } = await import("../../services/auth.Service.js");
+const { AuthService } = await import("../auth/auth.service.js");
 // importa a service também de forma dinâmica pelo mesmo motivo —
 // garante que quando ela for carregada, os mocks de bcrypt e jwt já estão no lugar.
 

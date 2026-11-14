@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
-import type { AuthService } from '../services/auth.Service.js';
-import type { LoginAuthDTO } from '../@types/auth/auth.input.dto.js';
+import type { AuthService } from '@modules/auth/auth.service.js';
+import type { LoginAuthDTO } from '@modules/auth/dto/auth.input.dto.js';
 
 export class AuthController {
 

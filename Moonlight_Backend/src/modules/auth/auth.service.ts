@@ -1,11 +1,11 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import type { LoginAuthDTO } from "../@types/auth/auth.input.dto.js";
+import type { LoginAuthDTO } from "@modules/auth/dto/auth.input.dto.js";
 import type { UserRepository } from "@modules/user/index.js";
 import { AppError } from "@shared/errors/AppError.js";
-import { validateLogin } from "../validators/auth.validator.js";
+import { validateLogin } from "@modules/auth/auth.validator.js";
 import type { UserRoleRepository } from "@modules/user/index.js";
-import type { AuthResponseDTO } from "../@types/auth/auth.output.dto.js";
+import type { AuthResponseDTO } from "@modules/auth/dto/auth.output.dto.js";
 
 export class AuthService {
   constructor(private userRepository: UserRepository, private userRoleRepository: UserRoleRepository) {}

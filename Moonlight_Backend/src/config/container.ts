@@ -1,4 +1,3 @@
-import { AuthController } from "../controllers/auth.Controller.js";
 import { CheckoutController } from "../controllers/checkout.Controller.js";
 import { GameController } from "../controllers/game.Controller.js";
 import { OrderController } from "../controllers/order.Controller.js";
@@ -6,24 +5,18 @@ import { UploadController } from "../controllers/upload.Controller.js";
 import { GameRepository } from "../repositories/GameRepository.js";
 import { OrderRepository } from "../repositories/OrderRepository.js";
 import { PurchasedItemsRepository } from "../repositories/PurchasedItemsRepository.js";
-import { AuthService } from "../services/auth.Service.js";
 import { CheckoutService } from "../services/checkout.Service.js";
 import { GameService } from "../services/game.Service.js";
 import { OrderService } from "../services/order.Service.js";
 import { PurchasedItemsService } from "../services/purchasedItems.Service.js";
+import { AuthController, AuthService } from "@modules/auth/index.js";
+import { UserController, UserService, UserRepository, RoleController, RoleRepository, RoleService, UserRoleRepository } from "@modules/user/index.js";
 import { CategoryController, CategoryRepository, CategoryService } from "@modules/category/index.js";
 import pool from "@shared/config/database.js";
 
 import type { Guards } from "@shared/types/guards.js";
 import { createAuthMiddleware } from "@modules/auth/auth.middleware.js";
 import { createRoleMiddleware } from "@modules/auth/role.middleware.js";
-import { UserRepository } from "@modules/user/user.repository.js";
-import { UserRoleRepository } from "@modules/user/role/user-role.repository.js";
-import { RoleRepository } from "@modules/user/role/role.repository.js";
-import { RoleService } from "@modules/user/role/role.service.js";
-import { UserService } from "@modules/user/user.service.js";
-import { UserController } from "@modules/user/user.controller.js";
-import { RoleController } from "@modules/user/role/role.controller.js";
 
 export const userRepository     = new UserRepository();
 const gameRepository     = new GameRepository(pool);
