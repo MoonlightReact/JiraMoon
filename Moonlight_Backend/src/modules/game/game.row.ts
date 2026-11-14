@@ -1,5 +1,5 @@
 import type { RowDataPacket } from "mysql2";
-import type { GameResponseCountRowsDTO } from "../dto/game.output.dto.js";
+import type { GameResponseCountRowsDTO } from "@modules/game/dto/game.output.dto.js";
 
 export type GameRow = RowDataPacket & {
     id_game: number;

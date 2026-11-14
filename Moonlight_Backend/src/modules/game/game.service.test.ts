@@ -1,17 +1,17 @@
 import { jest } from "@jest/globals";
-import type { GameRepository } from "../../repositories/GameRepository.js";
+import type { GameRepository } from "@modules/game/game.repository.js";
 import type {
   FilterParams,
   QueryOptions,
 } from "@shared/types/pagination.js";
-import type { Game } from "../../@types/game/repository/game.repository.js";
+import type { Game } from "@modules/game/game.repository.types.js";
 import type {
   CreateGameDTO,
   UpdateGameDTO,
-} from "../../@types/game/dto/game.input.dto.js";
+} from "@modules/game/dto/game.input.dto.js";
 import type { Pool, PoolConnection } from "mysql2/promise";
 
-const { GameService } = await import("../../services/game.Service.js");
+const { GameService } = await import("./game.service.js");
 
 const mockPoolConnection = {
   beginTransaction: jest.fn<() => Promise<void>>().mockResolvedValue(undefined),

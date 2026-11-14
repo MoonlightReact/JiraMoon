@@ -1,8 +1,8 @@
 import type { Pool, PoolConnection, ResultSetHeader } from "mysql2/promise";
-import type { Game } from "../@types/game/repository/game.repository.js";
-import type { GameCountRows, GameRow } from "../@types/game/repository/game.row.js";
+import type { Game } from "@modules/game/game.repository.types.js";
+import type { GameCountRows, GameRow } from "@modules/game/game.row.js";
 import pool from "@shared/config/database.js";
-import type { CreateGameDTO, UpdateGameDTO } from "../@types/game/dto/game.input.dto.js";
+import type { CreateGameDTO, UpdateGameDTO } from "@modules/game/dto/game.input.dto.js";
 import type { FilterParams, QueryOptions } from "@shared/types/pagination.js";
 
 export class GameRepository{
