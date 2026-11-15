@@ -1,11 +1,11 @@
 import { jest } from "@jest/globals";
-import type { OrderRepository } from "../../repositories/OrderRepository.js";
+import type { OrderRepository } from "@modules/order/order.repository.js";
 import type {
   CreateOrderDTO,
   UpdateOrderDTO,
-} from "../../@types/order/dto/order.input.dto.js";
-import type { PurchasedItemsRepository } from "../../repositories/PurchasedItemsRepository.js";
-import type { CreatePurchasedItemsDTO } from "../../@types/purchasedItem/purchasedItem.dto.js";
+} from "@modules/order/dto/order.input.dto.js";
+import type { PurchasedItemsRepository } from "@modules/order/purchased-items.repository.js";
+import type { CreatePurchasedItemsDTO } from "@modules/order/dto/purchased-items.dto.js";
 
 const mockPreferenceCreate = jest.fn<(...args: any[]) => Promise<any>>();
 const mockPaymentGet = jest.fn<(...args: any[]) => Promise<any>>();
@@ -20,11 +20,11 @@ jest.unstable_mockModule("mercadopago", () => ({
   })),
 }));
 
-const { OrderService } = await import("../../services/order.Service.js");
+const { OrderService } = await import("./order.service.js");
 const { PurchasedItemsService } =
-  await import("../../services/purchasedItems.Service.js");
+  await import("./purchased-items.service.js");
 const { Preference, Payment } = await import("mercadopago");
-const { CheckoutService } = await import("../../services/checkout.Service.js");
+const { CheckoutService } = await import("./checkout.service.js");
 
 const mockOrderRepository = {
   canPurchaseGame:

@@ -1,8 +1,8 @@
 import {MercadoPagoConfig,  Payment,  Preference } from "mercadopago";
-import { OrderService } from "./order.Service.js";
-import { PurchasedItemsService } from "./purchasedItems.Service.js";
-import type { CreateCheckoutDTO } from "../@types/checkout/checkout.dto.js";
-import type { PurchasedItemsDTO } from "../@types/purchasedItem/purchasedItem.dto.js";
+import { OrderService } from "@modules/order/order.service.js";
+import { PurchasedItemsService } from "@modules/order/purchased-items.service.js";
+import type { CreateCheckoutDTO } from "@modules/order/dto/checkout.dto.js";
+import type { PurchasedItemsDTO } from "@modules/order/dto/purchased-items.dto.js";
 import { AppError } from "@shared/errors/AppError.js";
 type PaymentStatus = 'approved' | 'pending' | 'canceled';
 

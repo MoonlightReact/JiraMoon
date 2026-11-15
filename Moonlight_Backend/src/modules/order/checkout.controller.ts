@@ -1,14 +1,11 @@
 import type { NextFunction, Request, Response } from 'express';
-import type { CheckoutService } from '../services/checkout.Service.js';
-import type { CreateCheckoutDTO, MercadoPagoWebhookDTO } from '../@types/checkout/checkout.dto.js';
-import type { OrderService } from '../services/order.Service.js';
-import { AppError } from '@shared/errors/AppError.js';
+import type { CheckoutService } from '@modules/order/checkout.service.js';
+import type { CreateCheckoutDTO, MercadoPagoWebhookDTO } from '@modules/order/dto/checkout.dto.js';
 
 export class CheckoutController{
 
     constructor(
         private checkoutService: CheckoutService,
-        private orderService: OrderService
     ){}
 
     createCheckout = async (req: Request, res: Response, next: NextFunction): Promise<void> => {

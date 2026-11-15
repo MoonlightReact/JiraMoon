@@ -3,10 +3,9 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import uploadRoutes from '../routes/upload.Routes.js'
-import checkoutRoutes from '../routes/checkout.Routes.js';
-import orderRoutes from '../routes/order.Routes.js';
+import { createOrderRoutes, createCheckoutRoutes } from "@modules/order/index.js";
 import { errorMiddleware } from '@shared/middlewares/error.Middleware.js';
-import { authController, categoryController, gameController, guards, roleController, userController } from '../config/container.js';
+import { authController, categoryController, checkoutController, gameController, guards, orderController, roleController, userController } from '../config/container.js';
 import { createGameRoutes } from '@modules/game/index.js';
 import { createCategoryRoutes } from '@modules/category/index.js';
 import { createRoleRoutes, createUserRoutes } from '@modules/user/index.js';
@@ -32,8 +31,8 @@ app.use('/api/roles', createRoleRoutes(roleController, guards));
 app.use('/api/users', createUserRoutes(userController, guards));
 app.use('/api/games', createGameRoutes(gameController, guards));
 app.use('/api/categories', createCategoryRoutes(categoryController, guards));
-app.use('/api/checkout', checkoutRoutes);
-app.use('/api/orders', orderRoutes);
+app.use('/api/checkout', createCheckoutRoutes(checkoutController, guards));
+app.use('/api/orders', createOrderRoutes(orderController, guards));
 app.use(errorMiddleware);
 
 const PORT = process.env.PORT || 3000;
