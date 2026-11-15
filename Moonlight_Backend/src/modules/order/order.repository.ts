@@ -1,8 +1,8 @@
 import type { ResultSetHeader, RowDataPacket } from "mysql2";
 import pool from "@shared/config/database.js";
-import type { ApprovedOrdersOfUser, Order, OrderWithoutUser } from "../@types/order/repository/order.repository.js";
-import type { CreateOrderDTO, UpdateOrderDTO } from "../@types/order/dto/order.input.dto.js";
-import type { LibraryOrderRows, MyOrderRows, OrderRow } from "../@types/order/repository/order.row.js";
+import type { ApprovedOrdersOfUser, Order, OrderWithoutUser } from "@modules/order/order.repository.types.js";
+import type { CreateOrderDTO, UpdateOrderDTO } from "@modules/order/dto/order.input.dto.js";
+import type { LibraryOrderRows, MyOrderRows, OrderRow } from "@modules/order/order.row.js";
 
 export class OrderRepository{
 

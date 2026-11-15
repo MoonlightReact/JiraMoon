@@ -1,13 +1,7 @@
-import { CheckoutController } from "../controllers/checkout.Controller.js";
-import { OrderController } from "../controllers/order.Controller.js";
 import { UploadController } from "../controllers/upload.Controller.js";
-import { OrderRepository } from "../repositories/OrderRepository.js";
-import { PurchasedItemsRepository } from "../repositories/PurchasedItemsRepository.js";
-import { CheckoutService } from "../services/checkout.Service.js";
-import { OrderService } from "../services/order.Service.js";
-import { PurchasedItemsService } from "../services/purchasedItems.Service.js";
 import { AuthController, AuthService } from "@modules/auth/index.js";
 import { GameController, GameRepository, GameService } from "@modules/game/index.js";
+import { CheckoutController, CheckoutService, OrderController, OrderRepository, PurchasedItemsRepository, OrderService, PurchasedItemsService} from "@modules/order/index.js";
 import { UserController, UserService, UserRepository, RoleController, RoleRepository, RoleService, UserRoleRepository } from "@modules/user/index.js";
 import { CategoryController, CategoryRepository, CategoryService } from "@modules/category/index.js";
 import pool from "@shared/config/database.js";
@@ -39,7 +33,7 @@ export const gameController     = new GameController(gameService);
 export const orderController    = new OrderController(orderService);
 export const categoryController = new CategoryController(categoryService);
 export const authController     = new AuthController(authService);
-export const checkoutController = new CheckoutController(checkoutService, orderService);
+export const checkoutController = new CheckoutController(checkoutService);
 export const roleController = new RoleController(roleService);
 
 export const guards: Guards = {

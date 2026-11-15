@@ -1,7 +1,7 @@
-import { OrderRepository } from "../repositories/OrderRepository.js";
-import type { OrderResponseDTO, OrderResponseLibraryDTO, OrderResponseMyOrdersDTO } from "../@types/order/dto/order.output.dto.js";
-import type { CreateOrderDTO, UpdateOrderDTO } from "../@types/order/dto/order.input.dto.js";
-import { validateOrderCreate, validateOrderStatusUpdate } from "../validators/order.validator.js";
+import { OrderRepository } from "@modules/order/order.repository.js";
+import type { OrderResponseDTO, OrderResponseLibraryDTO, OrderResponseMyOrdersDTO } from "@modules/order/dto/order.output.dto.js";
+import type { CreateOrderDTO, UpdateOrderDTO } from "@modules/order/dto/order.input.dto.js";
+import { validateOrderCreate, validateOrderStatusUpdate } from "@modules/order/order.validator.js";
 
 export class OrderService{
 
@@ -22,7 +22,7 @@ export class OrderService{
     async findOrderById(id_order: number): Promise<OrderResponseDTO | null>{
         return this.orderRepository.findById(id_order);
     }
-    
+
     async canPurchaseGame(id_user: number, id_game: number): Promise<boolean> {
         return this.orderRepository.canPurchaseGame(id_user, id_game);
     }
@@ -37,5 +37,5 @@ export class OrderService{
         return this.orderRepository.updateStatus(dto);
     }
 
-    
+
 }

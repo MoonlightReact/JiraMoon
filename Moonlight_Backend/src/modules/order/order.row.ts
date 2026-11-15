@@ -3,7 +3,7 @@
  */
 
 import type { RowDataPacket } from "mysql2";
-import type { OrderResponseMyOrdersDTO } from "../dto/order.output.dto.js";
+import type { OrderResponseMyOrdersDTO } from "@modules/order/dto/order.output.dto.js";
 
 export type OrderRow = RowDataPacket & {
   id_order: number;

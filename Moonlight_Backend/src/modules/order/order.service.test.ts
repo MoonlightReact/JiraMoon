@@ -1,20 +1,20 @@
 import { jest } from "@jest/globals";
-import type { OrderRepository } from "../../repositories/OrderRepository.js";
+import type { OrderRepository } from "@modules/order/order.repository.js";
 import type {
   ApprovedOrdersOfUser,
   Order,
   OrderWithoutUser,
-} from "../../@types/order/repository/order.repository.js";
+} from "@modules/order/order.repository.types.js";
 import type {
   CreateOrderDTO,
   UpdateOrderDTO,
-} from "../../@types/order/dto/order.input.dto.js";
+} from "@modules/order/dto/order.input.dto.js";
 import type {
   MyOrderRows,
   OrderRow,
-} from "../../@types/order/repository/order.row.js";
+} from "@modules/order/order.row.js";
 
-const { OrderService } = await import("../../services/order.Service.js");
+const { OrderService } = await import("./order.service.js");
 
 const mockOrderRepository = {
   findUserLibrary:

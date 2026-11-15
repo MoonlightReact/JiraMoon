@@ -1,4 +1,4 @@
-import type { CreateOrderDTO, UpdateOrderDTO } from "../@types/order/dto/order.input.dto.js";
+import type { CreateOrderDTO, UpdateOrderDTO } from "@modules/order/dto/order.input.dto.js";
 import { AppError } from "@shared/errors/AppError.js";
 import { assertPrice, assertRequiredFields } from "@shared/validator/common.validator.js";
 type validOrderStatus = "pending" | "approved" | "canceled";

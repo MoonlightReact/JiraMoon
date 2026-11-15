@@ -1,6 +1,6 @@
 import { jest } from "@jest/globals";
-import type { CreatePurchasedItemsDTO } from "../../@types/purchasedItem/purchasedItem.dto.js";
-import type { PurchasedItemsRepository } from "../../repositories/PurchasedItemsRepository.js";
+import type { CreatePurchasedItemsDTO } from "@modules/order/dto/purchased-items.dto.js";
+import type { PurchasedItemsRepository } from "@modules/order/purchased-items.repository.js";
 
 // Mock do pool ANTES de importar o service
 jest.unstable_mockModule("@shared/config/database.js", () => ({
@@ -8,7 +8,7 @@ jest.unstable_mockModule("@shared/config/database.js", () => ({
 }));
 
 const { PurchasedItemsService } =
-  await import("../../services/purchasedItems.Service.js");
+  await import("./purchased-items.service.js");
 
 const mockPurchasedItemsRepository = {
   createItem: jest.fn<(query: CreatePurchasedItemsDTO) => Promise<void>>(),

@@ -1,5 +1,5 @@
-import type { PurchasedItemsDTO } from "../@types/purchasedItem/purchasedItem.dto.js";
-import { PurchasedItemsRepository } from "../repositories/PurchasedItemsRepository.js";
+import type { PurchasedItemsDTO } from "@modules/order/dto/purchased-items.dto.js";
+import { PurchasedItemsRepository } from "@modules/order/purchased-items.repository.js";
 
 export class PurchasedItemsService {
   constructor(private purchasedItemsRepository: PurchasedItemsRepository) {}
