@@ -1,4 +1,4 @@
-import { UploadController } from "../controllers/upload.Controller.js";
+import { UploadController } from "@modules/upload/index.js";
 import { AuthController, AuthService } from "@modules/auth/index.js";
 import { GameController, GameRepository, GameService } from "@modules/game/index.js";
 import { CheckoutController, CheckoutService, OrderController, OrderRepository, PurchasedItemsRepository, OrderService, PurchasedItemsService} from "@modules/order/index.js";
