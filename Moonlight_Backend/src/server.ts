@@ -2,9 +2,11 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
-import { createOrderRoutes, createCheckoutRoutes } from "@modules/order/index.js";
 import { errorMiddleware } from '@shared/middlewares/error.middleware.js';
+
 import { authController, categoryController, checkoutController, gameController, guards, orderController, roleController, uploadController, userController } from './config/container.js';
+
+import { createOrderRoutes, createCheckoutRoutes } from "@modules/order/index.js";
 import { createGameRoutes } from '@modules/game/index.js';
 import { createCategoryRoutes } from '@modules/category/index.js';
 import { createRoleRoutes, createUserRoutes } from '@modules/user/index.js';

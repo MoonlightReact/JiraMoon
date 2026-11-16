@@ -1,8 +1,6 @@
 import { jest } from "@jest/globals";
-import type { UserRepository } from "@modules/user/index.js";
-import type { UserWithPassword } from "@modules/user/index.js";
+import type { UserWithPassword, UserRepository, UserRoleRepository } from "@modules/user/index.js";
 import type { AuthResponseDTO } from "@modules/auth/dto/auth.output.dto.js";
-import type { UserRoleRepository } from "@modules/user/index.js";
 
 jest.unstable_mockModule("bcryptjs", () => ({
   default: { compare: jest.fn() },
