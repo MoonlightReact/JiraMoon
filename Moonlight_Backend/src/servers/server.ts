@@ -2,14 +2,14 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
-import uploadRoutes from '../routes/upload.Routes.js'
 import { createOrderRoutes, createCheckoutRoutes } from "@modules/order/index.js";
 import { errorMiddleware } from '@shared/middlewares/error.Middleware.js';
-import { authController, categoryController, checkoutController, gameController, guards, orderController, roleController, userController } from '../config/container.js';
+import { authController, categoryController, checkoutController, gameController, guards, orderController, roleController, uploadController, userController } from '../config/container.js';
 import { createGameRoutes } from '@modules/game/index.js';
 import { createCategoryRoutes } from '@modules/category/index.js';
 import { createRoleRoutes, createUserRoutes } from '@modules/user/index.js';
 import { createAuthRoutes } from '@modules/auth/index.js';
+import { createUploadRoutes } from '@modules/upload/index.js';
 
 dotenv.config();
 
@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
 //para pegar imagens direto da pasta uploads.
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
-app.use('/api/uploads', uploadRoutes);
+app.use('/api/uploads', createUploadRoutes(uploadController, guards));
 app.use('/api/auth', createAuthRoutes(authController));
 app.use('/api/roles', createRoleRoutes(roleController, guards));
 app.use('/api/users', createUserRoutes(userController, guards));

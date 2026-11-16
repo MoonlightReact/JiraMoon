@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
-import { multerUpload } from "@shared/config/multer.js";
 import multer from "multer";
 import { AppError } from "@shared/errors/AppError.js";
+import { multerUpload } from "../config/multer.js";
 
 export function uploadMiddleware(req: Request, res: Response, next: NextFunction): void {
 

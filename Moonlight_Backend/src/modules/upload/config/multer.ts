@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const context = req.params.context!;
 
-    if (!isValidContext(context)) return cb(new Error('Contexto de upload inválido'), '');
+    if (typeof context !== 'string' || !isValidContext(context)) return cb(new Error('Contexto de upload inválido'), '');
 
     const directory = path.join(UPLOAD_ROOT, context);
     if(!fs.existsSync(directory)) fs.mkdirSync(directory, {recursive: true})
