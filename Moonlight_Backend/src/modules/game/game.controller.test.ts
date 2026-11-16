@@ -1,5 +1,5 @@
 import request from "supertest";
-import app from "../../servers/server.js";
+import app from "../../server.js";
 
 let adminToken: string;
 let createdGameId: number;

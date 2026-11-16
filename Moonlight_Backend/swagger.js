@@ -10,7 +10,7 @@ const doc = {
 };
 
 const outputFile = './swagger-output.json';
-const routesFiles = ['./src/servers/server.ts'];
+const routesFiles = ['./src/server.ts'];
 
 // Instancia e executa a função
 swaggerAutogen()(outputFile, routesFiles, doc);

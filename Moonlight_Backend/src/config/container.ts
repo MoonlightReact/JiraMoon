@@ -1,14 +1,36 @@
-import { UploadController } from "@modules/upload/index.js";
-import { AuthController, AuthService } from "@modules/auth/index.js";
-import { GameController, GameRepository, GameService } from "@modules/game/index.js";
-import { CheckoutController, CheckoutService, OrderController, OrderRepository, PurchasedItemsRepository, OrderService, PurchasedItemsService} from "@modules/order/index.js";
-import { UserController, UserService, UserRepository, RoleController, RoleRepository, RoleService, UserRoleRepository } from "@modules/user/index.js";
-import { CategoryController, CategoryRepository, CategoryService } from "@modules/category/index.js";
 import pool from "@shared/config/database.js";
-
 import type { Guards } from "@shared/types/guards.js";
+
+import { UserRepository } from "@modules/user/user.repository.js";
+import { UserService } from "@modules/user/user.service.js";
+import { UserController } from "@modules/user/user.controller.js";
+import { RoleRepository } from "@modules/user/role/role.repository.js";
+import { UserRoleRepository } from "@modules/user/role/user-role.repository.js";
+import { RoleService } from "@modules/user/role/role.service.js";
+import { RoleController } from "@modules/user/role/role.controller.js";
+
+import { AuthService } from "@modules/auth/auth.service.js";
+import { AuthController } from "@modules/auth/auth.controller.js";
 import { createAuthMiddleware } from "@modules/auth/auth.middleware.js";
 import { createRoleMiddleware } from "@modules/auth/role.middleware.js";
+
+import { GameRepository } from "@modules/game/game.repository.js";
+import { GameService } from "@modules/game/game.service.js";
+import { GameController } from "@modules/game/game.controller.js";
+
+import { CategoryRepository } from "@modules/category/category.repository.js";
+import { CategoryService } from "@modules/category/category.service.js";
+import { CategoryController } from "@modules/category/category.controller.js";
+
+import { OrderRepository } from "@modules/order/order.repository.js";
+import { OrderService } from "@modules/order/order.service.js";
+import { OrderController } from "@modules/order/order.controller.js";
+import { PurchasedItemsRepository } from "@modules/order/purchased-items.repository.js";
+import { PurchasedItemsService } from "@modules/order/purchased-items.service.js";
+import { CheckoutService } from "@modules/order/checkout.service.js";
+import { CheckoutController } from "@modules/order/checkout.controller.js";
+
+import { UploadController } from "@modules/upload/upload.controller.js";
 
 export const userRepository     = new UserRepository();
 const gameRepository     = new GameRepository(pool);

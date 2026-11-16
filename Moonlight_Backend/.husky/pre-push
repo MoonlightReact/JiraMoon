@@ -1,12 +1,18 @@
 #!/bin/sh
-echo "🧪 Rodando testes antes do push..."
-npm test
+echo "🏛️ Verificando fronteiras arquiteturais..."
+if ! npm run arch:check; then
+  echo ""
+  echo "❌ Violação de arquitetura! Push bloqueado."
+  echo ""
+  exit 1
+fi
 
-if [ $? -ne 0 ]; then
+echo "🧪 Rodando testes antes do push..."
+if ! npm test; then
   echo ""
   echo "❌ Testes falharam! Push bloqueado."
   echo ""
   exit 1
 fi
 
-echo "✅ Testes passaram!"
+echo "✅ Arquitetura e testes OK!"

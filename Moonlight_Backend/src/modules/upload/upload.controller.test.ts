@@ -1,7 +1,7 @@
 import request from "supertest";
 import fs from "fs";
 import path from "path";
-import app from "../../servers/server.js";
+import app from "../../server.js";
 
 let adminToken: string;
 const createdFiles: string[] = [];
