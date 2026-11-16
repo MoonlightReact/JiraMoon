@@ -7,8 +7,7 @@ import { CategoryController, CategoryRepository, CategoryService } from "@module
 import pool from "@shared/config/database.js";
 
 import type { Guards } from "@shared/types/guards.js";
-import { createAuthMiddleware } from "@modules/auth/auth.middleware.js";
-import { createRoleMiddleware } from "@modules/auth/role.middleware.js";
+import { createAuthMiddleware, createRoleMiddleware } from "@modules/auth/index.js";
 
 export const userRepository     = new UserRepository();
 const gameRepository     = new GameRepository(pool);

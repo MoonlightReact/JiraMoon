@@ -19,6 +19,17 @@ module.exports = {
       },
     },
     {
+      name: 'no-module-deep-imports-from-outside',
+      severity: 'error',
+      comment: 'Arquivos fora de modules/ (server, config) também só importam módulos via index.ts',
+      from: {
+        pathNot: '^(src/modules/|src/config/container\\.ts$)',
+      },
+      to: {
+        path: '^src/modules/[^/]+/(?!index\\.ts$)',
+      },
+    },
+    {
       name: 'shared-cannot-depend-on-modules',
       severity: 'error',
       comment: 'A camada shared não pode importar nada de modules',

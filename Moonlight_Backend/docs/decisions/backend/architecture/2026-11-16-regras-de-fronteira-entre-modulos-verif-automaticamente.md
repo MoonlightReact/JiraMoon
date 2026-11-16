@@ -14,6 +14,7 @@ Impor as regras com `dependency-cruiser` (`npm run arch:check`):
 1. `no-circular`: nenhum ciclo de importação.
 2. `no-module-deep-imports`: módulos só se comunicam pelo `index.ts` (barrel).
 3. `shared-cannot-depend-on-modules`: `shared/` não importa de `modules/`.
+4. `no-module-deep-imports-from-outside`: no dependency-cruiser exclui explicitamente `src/config/container.ts`.
 O check roda no hook `pre-push` do Husky e falha o push em caso de violação.
 
 ## Alternativas consideradas
@@ -22,6 +23,11 @@ O check roda no hook `pre-push` do Husky e falha o push em caso de violação.
 ## Consequências
 - (+) Violações arquiteturais são pegas antes de chegar ao remoto.
 - (+) A regra do barrel prepara a extração futura de módulos para serviços.
+- (+) O `src/config/container.ts` (composition root) é a **única exceção**
+  à regra do barrel: pode importar classes concretas dos módulos para
+  montar o grafo de dependências. Todo o restante do código só importa
+  via `index.ts`. Isso mantém os barrels enxutos (rotas e contratos)
+  sem impedir a composição da aplicação.
 - (−) Todo import entre módulos precisa passar pelo `index.ts`,
   o que exige manter os barrels atualizados.
 - (−) Mais uma etapa no pre-push.
