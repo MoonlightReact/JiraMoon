@@ -1,5 +1,5 @@
 import request from "supertest";
-import app from "../../servers/server.js";
+import app from "../../server.js";
 
 afterAll(async () => {
   await new Promise((resolve) => setTimeout(resolve, 500));
