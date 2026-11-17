@@ -7,7 +7,7 @@ import { buildSqlFilters } from "@shared/query/sqlFilterBuilder.js";
 import type { Pool } from "mysql2/promise";
 import { validateGame } from "@modules/game/game.validator.js";
 import type { CacheService } from "@shared/cache/cache.service.js";
-import { GAME_DETAIL_TTL, GAME_LIST_TTL, gameIdKey, gameListKey } from "./game.cache.js";
+import { GAME_DETAIL_TTL, GAME_LIST_PREFIX, GAME_LIST_TTL, gameIdKey, gameListKey } from "./game.cache.js";
 
 export class GameService {
 
@@ -67,16 +67,19 @@ export class GameService {
     const connection = await this.pool.getConnection();
     await connection.beginTransaction();
     try{
-        validateGame(dto);
-        const id_game = await this.gameRepository.create(dto, connection);
-        await this.gameRepository.replaceCategories(id_game, dto.categories, connection);
-        await connection.commit();
-        return id_game;
+      validateGame(dto);
+      const id_game = await this.gameRepository.create(dto, connection);
+      await this.gameRepository.replaceCategories(id_game, dto.categories, connection);
+      await connection.commit();
+
+      await this.cacheService.delByPrefix(GAME_LIST_PREFIX);
+
+      return id_game;
     } catch(err){
-        await connection.rollback();
-        throw err;
+      await connection.rollback();
+      throw err;
     } finally {
-        connection.release();
+      connection.release();
     }
   }
 
@@ -84,21 +87,32 @@ export class GameService {
     const connection = await this.pool.getConnection();
     await connection.beginTransaction();
     try{
-        validateGame(dto);
-        const updated = await this.gameRepository.update(dto, connection);
-        await this.gameRepository.replaceCategories(dto.id_game, dto.categories, connection);
-        await connection.commit();
-        return updated;
+      validateGame(dto);
+      const updated = await this.gameRepository.update(dto, connection);
+      await this.gameRepository.replaceCategories(dto.id_game, dto.categories, connection);
+      await connection.commit();
+
+      await this.cacheService.del(gameIdKey(dto.id_game));
+      await this.cacheService.delByPrefix(GAME_LIST_PREFIX);
+
+      return updated;
     } catch(err){
-        await connection.rollback();
-        throw err;
+      await connection.rollback();
+      throw err;
     } finally{
-        connection.release();
+      connection.release();
     }
   }
 
   async delete(id_game: number): Promise<boolean>{
-    return this.gameRepository.delete(id_game);
+    const deleted = await this.gameRepository.delete(id_game);
+
+    if (deleted) {
+      await this.cacheService.del(gameIdKey(id_game));
+      await this.cacheService.delByPrefix(GAME_LIST_PREFIX);
+    }
+
+    return deleted
   }
 
 }
