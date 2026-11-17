@@ -10,6 +10,7 @@ import type {
   UpdateGameDTO,
 } from "@modules/game/dto/game.input.dto.js";
 import type { Pool, PoolConnection } from "mysql2/promise";
+import type { CacheService } from "@shared/cache/cache.service.js";
 
 const { GameService } = await import("./game.service.js");
 
@@ -42,8 +43,15 @@ const mockGameRepository = {
     >(),
 } as unknown as GameRepository;
 
+const mockCacheService = {
+  get: jest.fn<(key: string) => Promise<unknown>>().mockResolvedValue(null),
+  set: jest.fn<(key: string, value: unknown, ttl: number) => Promise<void>>().mockResolvedValue(undefined),
+  del: jest.fn<(...keys: string[]) => Promise<void>>().mockResolvedValue(undefined),
+  delByPrefix: jest.fn<(prefix: string) => Promise<void>>().mockResolvedValue(undefined),
+} as unknown as CacheService
+
 describe("GameService - Unitário", () => {
-  const service = new GameService(mockGameRepository, mockPool);
+  const service = new GameService(mockGameRepository, mockPool, mockCacheService);
 
   const mockSearchAllPaginated =
     mockGameRepository.findAllPaginated as jest.MockedFunction<
