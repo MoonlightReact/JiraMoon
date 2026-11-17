@@ -7,7 +7,7 @@ import { buildSqlFilters } from "@shared/query/sqlFilterBuilder.js";
 import type { Pool } from "mysql2/promise";
 import { validateGame } from "@modules/game/game.validator.js";
 import type { CacheService } from "@shared/cache/cache.service.js";
-import { GAME_LIST_TTL, gameListKey } from "./game.cache.js";
+import { GAME_DETAIL_TTL, GAME_LIST_TTL, gameIdKey, gameListKey } from "./game.cache.js";
 
 export class GameService {
 
@@ -51,7 +51,16 @@ export class GameService {
   }
 
   async findById(id_game: number): Promise<GameResponseDTO | null> {
-    return this.gameRepository.findById(id_game);
+    const key = gameIdKey(id_game);
+
+    const cached = await this.cacheService.get<GameResponseDTO>(key);
+    if (cached) return cached;
+
+    const game = this.gameRepository.findById(id_game);
+    // jogo inexistente (null) não é cacheado
+    if (game) await this.cacheService.set(key, game, GAME_DETAIL_TTL);
+
+    return game;
   }
 
   async create(dto: CreateGameDTO): Promise<number>{
