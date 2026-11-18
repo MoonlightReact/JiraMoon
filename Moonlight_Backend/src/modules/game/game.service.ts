@@ -47,7 +47,7 @@ export class GameService {
   }
 
   async findAll(): Promise<GameResponseDTO[]>{
-    return this.gameRepository.findAll();
+    return await this.gameRepository.findAll();
   }
 
   async findById(id_game: number): Promise<GameResponseDTO | null> {
@@ -56,7 +56,7 @@ export class GameService {
     const cached = await this.cacheService.get<GameResponseDTO>(key);
     if (cached) return cached;
 
-    const game = this.gameRepository.findById(id_game);
+    const game = await this.gameRepository.findById(id_game);
     // jogo inexistente (null) não é cacheado
     if (game) await this.cacheService.set(key, game, GAME_DETAIL_TTL);
 
