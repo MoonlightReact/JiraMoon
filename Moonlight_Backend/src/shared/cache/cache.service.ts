@@ -2,11 +2,11 @@ import { redis } from "@shared/cache/redis.js";
 
 export class CacheService {
 
-  // Em teste o cache vira no-op: os testes de integração batem no MySQL real
+  // em teste o cache vira no-op: os testes de integração batem no MySQL real
   // e um cache real faria uma execução ler dados velhos de outra.
   constructor(private enabled: boolean = process.env.NODE_ENV !== "test") { }
 
-  /** Retorna o valor em cache ou null (MISS, cache desligado ou Redis fora do ar). */
+  /** retorna o valor em cache ou null (MISS, cache desligado ou Redis fora do ar). */
   async get<CachedValue>(key: string): Promise<CachedValue | null> {
     if (!this.enabled) return null;
     try {
@@ -18,6 +18,7 @@ export class CacheService {
     }
   }
 
+  /** seta o valor no cache */
   async set<CachedValue>(key: string, value: CachedValue, ttlSeconds: number): Promise<void> {
     if (!this.enabled) return;
     try {
@@ -27,6 +28,7 @@ export class CacheService {
     }
   }
 
+  /** deleta chaves do cache */
   async del(...keys: string[]): Promise<void> {
     if (!this.enabled || keys.length === 0) return;
     try {
@@ -37,9 +39,9 @@ export class CacheService {
   }
 
   /**
-   * Apaga todas as chaves que começam com o prefixo.
-   * Usa SCAN em vez de KEYS: KEYS bloqueia o Redis inteiro enquanto varre.
-   * O prefixo não pode conter os caracteres especiais de glob (* ? [ ]).
+   * apaga todas as chaves que começam com o prefixo.
+   * usa SCAN em vez de KEYS: KEYS bloqueia o redis inteiro enquanto varre.
+   * o prefixo não pode conter os caracteres especiais de glob (* ? [ ]).
    */
   async delByPrefix(prefix: string): Promise<void> {
     if (!this.enabled) return;
@@ -55,7 +57,7 @@ export class CacheService {
     }
   }
 
-  // Falha do Redis nunca propaga: cache é otimização, não pode derrubar a API
+  // falha do Redis nunca propaga, cache é otimização, não pode derrubar a API
   // nem desfazer uma escrita que já foi commitada no MySQL.
   private logFailure(operation: string, target: string, err: unknown): void {
     const message = err instanceof Error ? err.message : String(err);
