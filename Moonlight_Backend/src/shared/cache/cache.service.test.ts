@@ -29,6 +29,7 @@ describe("CacheService - Unitário", () => {
     mockRedisScan.mockResolvedValue(["0", []]);
 
     // o cacheService loga as falhas; silenciado para não poluir a saída do teste
+    jest.spyOn(console, "log").mockImplementation(() => undefined);
     jest.spyOn(console, "error").mockImplementation(() => undefined);
   });
 
@@ -60,6 +61,24 @@ describe("CacheService - Unitário", () => {
       mockRedisGet.mockResolvedValue("{quebrado");
 
       expect(await service.get("game:id:1")).toBeNull();
+    });
+
+    it("loga HIT com a chave e o tempo", async () => {
+      mockRedisGet.mockResolvedValue('{"title":"Zelda"}');
+
+      await service.get("game:id:1");
+
+      expect(console.log).toHaveBeenCalledWith(
+        expect.stringMatching(/^\[Cache\] HIT game:id:1 \(\d+\.\d{2}ms\)$/),
+      );
+    });
+
+    it("loga MISS com a chave e o tempo", async () => {
+      await service.get("game:id:1");
+
+      expect(console.log).toHaveBeenCalledWith(
+        expect.stringMatching(/^\[Cache\] MISS game:id:1 \(\d+\.\d{2}ms\)$/),
+      );
     });
   });
 

@@ -9,9 +9,19 @@ export class CacheService {
   /** retorna o valor em cache ou null (MISS, cache desligado ou Redis fora do ar). */
   async get<CachedValue>(key: string): Promise<CachedValue | null> {
     if (!this.enabled) return null;
+
+    const start = performance.now();
     try {
       const raw = await redis.get(key);
-      return raw ? (JSON.parse(raw) as CachedValue) : null;
+      const ms = (performance.now() - start).toFixed(2);
+
+      if (raw === null) {
+        console.log(`[Cache] MISS ${key} (${ms}ms)`);
+        return null;
+      }
+
+      console.log(`[Cache] HIT ${key} (${ms}ms)`);
+      return JSON.parse(raw) as CachedValue;
     } catch (err) {
       this.logFailure("get", key, err);
       return null;
