@@ -13,7 +13,8 @@
     "arch:check": "depcruise src --config .dependency-cruiser.cjs",
     "migrate": "tsx tools/migrate.ts",
     "seed": "tsx tools/seed.ts",
-    "prepare": "husky || true"
+    "prepare": "husky || true",
+    "bench:cache": "node tools/bench-cache.mjs"
   },
   "keywords": [],
   "author": "",
@@ -25,6 +26,7 @@
     "cpf-cnpj-validator": "^1.0.3",
     "dotenv": "^17.3.1",
     "express": "^4.22.1",
+    "ioredis": "^6.0.0",
     "jsonwebtoken": "^9.0.3",
     "mercadopago": "^2.12.0",
     "multer": "^2.3.0",

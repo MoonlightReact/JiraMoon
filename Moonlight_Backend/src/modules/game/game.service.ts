@@ -6,76 +6,113 @@ import { gameFilterConfig } from "@modules/game/game.filter.js";
 import { buildSqlFilters } from "@shared/query/sqlFilterBuilder.js";
 import type { Pool } from "mysql2/promise";
 import { validateGame } from "@modules/game/game.validator.js";
+import type { CacheService } from "@shared/cache/cache.service.js";
+import { GAME_DETAIL_TTL, GAME_LIST_PREFIX, GAME_LIST_TTL, gameIdKey, gameListKey } from "./game.cache.js";
 
 export class GameService {
 
-    constructor(private gameRepository: GameRepository, private pool: Pool) {}
+  constructor(private gameRepository: GameRepository, private pool: Pool, private cacheService: CacheService) {}
 
-        async findAllPaginated(query: GetGamesPaginatedDTO): Promise<PaginatedResponse<GameResponseDTO>> {
-            const page = query.page || 1;
-            const limit = query.limit || 8;
-            const offset = (page - 1) * limit;
-            const order = query.random ? `RAND(${query.random_seed ?? 0})`  : 'g.id_game ASC'; // se vai randomizar ou ordenar de forma crescente
+  async findAllPaginated(query: GetGamesPaginatedDTO): Promise<PaginatedResponse<GameResponseDTO>> {
+    const page = query.page || 1;
+    const limit = query.limit || 8;
 
-            const baseWhere = query.admin ? 'WHERE 1=1' : 'WHERE g.active = 1';
+    const useCache = !query.random && !query.title;
+    const key = gameListKey(query, page, limit);
 
-            const safeQuery = { ...query };
-            if (!query.admin) delete safeQuery.active;
+    if (useCache) {
+      const cached = await this.cacheService.get<PaginatedResponse<GameResponseDTO>>(key);
+      if (cached) return cached;
+    }
 
-            const { where, params: dbParams } = buildSqlFilters(safeQuery, gameFilterConfig);
-            const finalWhere = baseWhere + where.replace('WHERE 1=1', '');
+    const offset = (page - 1) * limit;
+    const order = query.random ? `RAND(${query.random_seed ?? 0})`  : 'g.id_game ASC'; // se vai randomizar ou ordenar de forma crescente
 
-            const data = await this.gameRepository.findAllPaginated({filters: {dbParams, where: finalWhere, order}, pagination: {limit, offset}})
-            const total = await this.gameRepository.count({dbParams, where: finalWhere})
+    const baseWhere = query.admin ? 'WHERE 1=1' : 'WHERE g.active = 1';
 
-            return {data, total, page, totalPages: Math.ceil(total / limit)};
+    const safeQuery = { ...query };
+    if (!query.admin) delete safeQuery.active;
 
-        }
+    const { where, params: dbParams } = buildSqlFilters(safeQuery, gameFilterConfig);
+    const finalWhere = baseWhere + where.replace('WHERE 1=1', '');
 
-        async findAll(): Promise<GameResponseDTO[]>{
-            return this.gameRepository.findAll();
-        }
+    const data = await this.gameRepository.findAllPaginated({filters: {dbParams, where: finalWhere, order}, pagination: {limit, offset}})
+    const total = await this.gameRepository.count({dbParams, where: finalWhere})
 
-        async findById(id_game: number): Promise<GameResponseDTO | null> {
-            return this.gameRepository.findById(id_game);
-        }
+    const result = { data, total, page, totalPages: Math.ceil(total / limit) };
 
-        async create(dto: CreateGameDTO): Promise<number>{
-            const connection = await this.pool.getConnection();
-            await connection.beginTransaction();
-            try{
-                validateGame(dto);
-                const id_game = await this.gameRepository.create(dto, connection);
-                await this.gameRepository.replaceCategories(id_game, dto.categories, connection);
-                await connection.commit();
-                return id_game;
-            } catch(err){
-                await connection.rollback();
-                throw err;
-            } finally {
-                connection.release();
-            }
-        }
+    if (useCache) await this.cacheService.set(key, result, GAME_LIST_TTL);
 
-        async update(dto: UpdateGameDTO): Promise<boolean>{
-            const connection = await this.pool.getConnection();
-            await connection.beginTransaction();
-            try{
-                validateGame(dto);
-                const updated = await this.gameRepository.update(dto, connection);
-                await this.gameRepository.replaceCategories(dto.id_game, dto.categories, connection);
-                await connection.commit();
-                return updated;
-            } catch(err){
-                await connection.rollback();
-                throw err;
-            } finally{
-                connection.release();
-            }
-        }
+    return result;
+  }
 
-        async delete(id_game: number): Promise<boolean>{
-            return this.gameRepository.delete(id_game);
-        }
+  async findAll(): Promise<GameResponseDTO[]>{
+    return await this.gameRepository.findAll();
+  }
+
+  async findById(id_game: number): Promise<GameResponseDTO | null> {
+    const key = gameIdKey(id_game);
+
+    const cached = await this.cacheService.get<GameResponseDTO>(key);
+    if (cached) return cached;
+
+    const game = await this.gameRepository.findById(id_game);
+    // jogo inexistente (null) não é cacheado
+    if (game) await this.cacheService.set(key, game, GAME_DETAIL_TTL);
+
+    return game;
+  }
+
+  async create(dto: CreateGameDTO): Promise<number>{
+    const connection = await this.pool.getConnection();
+    await connection.beginTransaction();
+    try{
+      validateGame(dto);
+      const id_game = await this.gameRepository.create(dto, connection);
+      await this.gameRepository.replaceCategories(id_game, dto.categories, connection);
+      await connection.commit();
+
+      await this.cacheService.delByPrefix(GAME_LIST_PREFIX);
+
+      return id_game;
+    } catch(err){
+      await connection.rollback();
+      throw err;
+    } finally {
+      connection.release();
+    }
+  }
+
+  async update(dto: UpdateGameDTO): Promise<boolean>{
+    const connection = await this.pool.getConnection();
+    await connection.beginTransaction();
+    try{
+      validateGame(dto);
+      const updated = await this.gameRepository.update(dto, connection);
+      await this.gameRepository.replaceCategories(dto.id_game, dto.categories, connection);
+      await connection.commit();
+
+      await this.cacheService.del(gameIdKey(dto.id_game));
+      await this.cacheService.delByPrefix(GAME_LIST_PREFIX);
+
+      return updated;
+    } catch(err){
+      await connection.rollback();
+      throw err;
+    } finally{
+      connection.release();
+    }
+  }
+
+  async delete(id_game: number): Promise<boolean>{
+    const deleted = await this.gameRepository.delete(id_game);
+
+    if (deleted) {
+      await this.cacheService.del(gameIdKey(id_game));
+      await this.cacheService.delByPrefix(GAME_LIST_PREFIX);
+    }
+
+    return deleted
+  }
 
 }

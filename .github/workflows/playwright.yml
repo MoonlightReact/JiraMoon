@@ -36,6 +36,7 @@ jobs:
             "JWT_SECRET=${{ secrets.JWT_SECRET }}" \
             "MERCADOPAGO_ACCESS_TOKEN=${{ secrets.MERCADOPAGO_ACCESS_TOKEN }}" \
             "NGROK_URL=${{ secrets.NGROK_URL }}" \
+            "REDIS_URL=redis://redis:6379" \
             "PORT=3000" \
             "VITE_API_URL=https://moonlight.local" \
             "VITE_USE_MOCK=false" \
@@ -68,6 +69,12 @@ jobs:
 
       - name: Rodar testes Playwright
         run: npx playwright test
+
+      - name: Logs do Docker Compose (se falhar)
+        if: failure()
+        run: |
+          docker compose ps -a
+          docker compose logs --tail=200 --timestamps --no-color
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
