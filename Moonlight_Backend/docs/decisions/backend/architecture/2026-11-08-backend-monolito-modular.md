@@ -27,7 +27,7 @@ src/
 │       └── index.ts            ← única porta de entrada do módulo
 ├── shared/                     config, errors, middlewares, query, types
 ├── container.ts                composição das dependências
-└── servers/server.ts
+└── server.ts
 ```
 
 Regras que valem para todos os módulos:

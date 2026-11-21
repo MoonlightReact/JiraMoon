@@ -1,0 +1,64 @@
+import type { NextFunction, Request, Response } from 'express';
+import type { CheckoutService } from '@modules/order/checkout.service.js';
+import type { CreateCheckoutDTO, MercadoPagoWebhookDTO } from '@modules/order/dto/checkout.dto.js';
+
+export class CheckoutController{
+
+    constructor(
+        private checkoutService: CheckoutService,
+    ){}
+
+    createCheckout = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const dto = req.body as CreateCheckoutDTO;
+
+            const { preference_id, checkout_url } = await this.checkoutService.createPreference(dto);
+
+            res.status(200).json({ preference_id, checkout_url });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    handleWebhook = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const body = req.body as MercadoPagoWebhookDTO;
+
+            if (body.type !== "payment") { res.sendStatus(204); return; }
+
+            const paymentId = body.data?.id;
+            if (!paymentId) { res.sendStatus(204); return; }
+
+            const payment = await this.checkoutService.getPaymentStatus(paymentId);
+
+            res.status(200).json(payment);
+        } catch(error) {
+            next(error);
+        }
+    };
+
+    handleSuccess = async (req: Request, res: Response): Promise<void> => {
+        res.redirect('http://localhost:5173/checkout/success');
+    };
+
+    handleFailure = async (req: Request, res: Response): Promise<void> => {
+        res.redirect('http://localhost:5173/checkout/failure');
+    };
+
+    handlePending = async (req: Request, res: Response): Promise<void> => {
+        res.redirect('http://localhost:5173/checkout/pending');
+    };
+
+    // para testes EM COMPRAS DE CARTÃO:
+
+    //credenciais de teste:
+
+    //Cartão	    Número	                Código de segurança	    Data de vencimento
+    // Mastercard    // 5480 8328 0103 3311   // 123                   // 11/30
+
+    //Pra ser aprovado escreva no nome do titular do cartão: APRO
+    //CPF: 12345678909
+    //mais detalhes em: https://www.mercadopago.com.br/developers/panel/app
+
+
+}

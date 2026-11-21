@@ -9,7 +9,7 @@ Este repositório **não contém regra de negócio nem schema de banco**. O cód
 ## Subindo o ambiente
 
 1. **Variáveis:** copie `.example.env` para `.env` e preencha.
-2. **Host local:** adicione `127.0.0.1 moonlight.local` ao arquivo de hosts do sistema.
+2. **Host local:** adicione `127.0.0.1 moonlight.local` ao arquivo de hosts do sistema (**via Linux:** `/etc/hosts` | **via Windows:** `C:\Windows\System32\drivers\etc\hosts`).
 3. **Certificados:** os arquivos `nginx/certs/moonlight.local.pem` e `moonlight.local-key.pem` precisam existir. Se não existirem:
    ```bash
    mkcert -install
@@ -145,7 +145,7 @@ npm run build  →  tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.js
 ```
 
 - `tsconfig.build.json` herda do `tsconfig.json`, mas **exclui os testes** (`src/__test__`, `src/**/*.test.ts`). O editor e o `npx tsc --noEmit` continuam checando os testes, mas eles não entram no `dist` nem na imagem.
-- No Dockerfile, o estágio `builder` roda `npm run build` (o `npm ci` instala as devDependencies, incluindo o `tsc-alias`). O estágio final copia só o `dist` já reescrito e instala com `--omit=dev`, então produção roda `node dist/servers/server.js` sem depender de nada extra.
+- No Dockerfile, o estágio `builder` roda `npm run build` (o `npm ci` instala as devDependencies, incluindo o `tsc-alias`). O estágio final copia só o `dist` já reescrito e instala com `--omit=dev`, então produção roda `node dist/server.js` sem depender de nada extra.
 - O `tsconfig.json` **não usa `baseUrl`**: ele está deprecado no TypeScript 6. Os `paths` são relativos ao próprio arquivo (`./src/shared/*`).
 - `tools/` (`migrate` e `seed`) fica fora do tsconfig e usa **caminhos relativos**, não alias.
 
@@ -153,7 +153,7 @@ npm run build  →  tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.js
 
 ```bash
 npm run build && grep -rn "@shared" dist --include="*.js"   # não deve imprimir nada
-node dist/servers/server.js                                  # deve subir sem ERR_MODULE_NOT_FOUND
+node dist/server.js                                  # deve subir sem ERR_MODULE_NOT_FOUND
 ```
 
 ### Criando um alias novo

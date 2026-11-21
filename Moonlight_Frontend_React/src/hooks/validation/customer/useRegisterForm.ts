@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { validateRegister } from "../../../utils/Validation/Customer/ValidateRegister";
 import { getRegisterFormErrors } from "../../../utils/Validation/formErrors/Customer/getFormErrors";
 import { formatCPF } from "../../../utils/Validation/dataRules/User/userCpf";
-import { register } from "../../../services/realServices/auth.service";
+import { registerUser } from "../../../services/realServices/user.service.ts";
 
 export function useRegisterForm() {
     const navigate = useNavigate();
@@ -61,7 +61,7 @@ export function useRegisterForm() {
 
         try {
             setUi(prev => ({ ...prev, loading: true }));
-            await register({
+            await registerUser({
                 name: fields.name,
                 email: fields.email,
                 cpf: fields.cpf,

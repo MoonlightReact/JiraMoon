@@ -1,5 +1,5 @@
 import request from "supertest";
-import app from "../../servers/server.js";
+import app from "../../server.js";
 
 let adminToken: string;
 let createdCategoryId: number;
@@ -62,7 +62,7 @@ describe("Category Controller", () => {
         .send({ name: "Sem descricao" });
       expect(res.statusCode).toBe(400);
       expect(res.body.message).toBe(
-        "Campos inválidos de Create ou Update de Jogo",
+        "Todos os campos são obrigatórios",
       );
     });
 

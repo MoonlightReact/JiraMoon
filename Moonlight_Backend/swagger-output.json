@@ -3,7 +3,7 @@
   "info": {
     "title": "Moonlight_Backend_API",
     "description": "Documentação automática de todas as rotas",
-    "version": "1.0.0"
+    "version": "1.2.2"
   },
   "host": "localhost:3000",
   "basePath": "/",
@@ -60,7 +60,7 @@
         }
       }
     },
-    "/api/auth/register": {
+    "/api/users/register": {
       "post": {
         "description": "",
         "responses": {

@@ -12,6 +12,17 @@ x-db-env: &db-env
   DB_PASSWORD: ${DB_PASSWORD}
 
 services:
+  redis:
+    image: redis:7-alpine
+    container_name: redisService
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks: [db_network]
+
   database:
     image: mysql:8
     restart: always
@@ -23,7 +34,7 @@ services:
     volumes:
       - db-data:/var/lib/mysql
     healthcheck:
-      # Testa se o MySQL está realmente pronto para receber conexões
+      # testa se o mysql ta realmente pronto para receber conexões
       test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
       interval: 5s
       timeout: 5s
@@ -55,6 +66,7 @@ services:
     restart: unless-stopped
     environment:
       <<: *db-env
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
       NGROK_URL: ${NGROK_URL}
       MERCADOPAGO_ACCESS_TOKEN: ${MERCADOPAGO_ACCESS_TOKEN}
       JWT_SECRET: ${JWT_SECRET}
@@ -64,7 +76,9 @@ services:
       - uploads-data:/Moonlight_Backend/uploads
     depends_on:
       migrate:
-        condition: service_completed_successfully # Só sobe depois que o migrate terminou com sucesso
+        condition: service_completed_successfully # só sobe assim que o migrate terminou
+      redis:
+        condition: service_healthy
     networks: [proxy_network, db_network]
 
   frontend:
