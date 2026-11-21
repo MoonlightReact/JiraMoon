@@ -1,0 +1,21 @@
+@startuml moonlight-c4-contexto
+!include <C4/C4_Context>
+
+title Diagrama de Contexto do sistema Moonlight
+
+Person(jogador, "Jogador", "Compra jogos e acessa a biblioteca.")
+Person(admin, "Administrador", "Gerencia catálogo e operações.")
+
+System(moonlight, "Moonlight", "Loja de jogos com biblioteca, catálogo e pedidos.")
+
+System_Ext(mp, "Mercado Pago", "Processa pagamentos e envia webhook do resultado.")
+System_Ext(email, "Provedor de e-mail", "Entrega e-mails de confirmação de pedido.")
+
+Rel(jogador, moonlight, "Usa", "HTTPS")
+Rel(admin, moonlight, "Usa", "HTTPS")
+Rel(moonlight, mp, "Cria e consulta pagamentos", "HTTPS")
+Rel(mp, moonlight, "Envia webhook do resultado", "HTTPS")
+Rel(moonlight, email, "Envia e-mails usando", "SMTP")
+
+SHOW_LEGEND()
+@enduml
