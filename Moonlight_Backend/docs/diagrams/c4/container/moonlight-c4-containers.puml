@@ -1,0 +1,42 @@
+@startuml moonlight-c4-containers
+!include <C4/C4_Container>
+
+title Diagrama de Containers do sistema Moonlight
+
+Person(jogador, "Jogador", "Compra jogos e acessa a biblioteca.")
+Person(admin, "Administrador", "Gerencia catálogo e operações.")
+System_Ext(mp, "Mercado Pago", "Processa pagamentos e envia webhook do resultado.")
+System_Ext(email, "Provedor de e-mail", "Entrega e-mails de confirmação de pedido.")
+
+System_Boundary(moonlight, "Moonlight") {
+    Container(frontend, "Frontend", "React + Vite", "SPA da loja e do painel administrativo.")
+    Container(nginx, "Nginx", "Reverse proxy", "Termina HTTPS, serve os estáticos e encaminha /api para a API.")
+    Container(api, "API Principal", "Node.js, monólito modular", "Auth/RBAC, catálogo e orquestração das compras.")
+    Container(order, "Order Service", "Node.js, microsserviço", "Gerencia pedidos e o ciclo de pagamento.")
+    Container(notif, "Notification Service", "Node.js, microsserviço", "Consome eventos e envia as notificações.")
+    ContainerDb(redis, "Redis", "Cache + Pub/Sub", "Cache-aside e barramento de eventos.")
+    ContainerDb(mysql, "MySQL", "banco principal", "Usuários, jogos e categorias.")
+    ContainerDb(ordersdb, "orders_db", "MySQL", "Pedidos e pagamentos.")
+    ContainerDb(notifdb, "notifications_db", "MySQL", "Histórico de notificações.")
+}
+
+Rel(jogador, nginx, "Usa", "HTTPS")
+Rel(admin, nginx, "Usa", "HTTPS")
+Rel(mp, nginx, "Webhook", "HTTPS")
+Rel_L(nginx, frontend, "Entrega estáticos", "HTTPS")
+Rel_D(nginx, api, "Encaminha /api", "HTTP")
+
+Rel(api, mp, "Cria pagamento", "HTTPS")
+Rel(api, redis, "Cache-aside", "RESP")
+BiRel_R(api, order, "Cria e consulta pedidos", "HTTP/JSON")
+Rel(order, mp, "Consulta pagamento", "HTTPS")
+Rel_R(order, redis, "Publica eventos", "Pub/Sub")
+Rel_R(redis, notif, "Entrega eventos", "Pub/Sub")
+Rel(notif, email, "Envia e-mail usando", "SMTP")
+
+Rel_D(api, mysql, "Lê e grava", "SQL")
+Rel_D(order, ordersdb, "Lê e grava", "SQL")
+Rel_D(notif, notifdb, "Lê e grava", "SQL")
+
+SHOW_LEGEND()
+@enduml
