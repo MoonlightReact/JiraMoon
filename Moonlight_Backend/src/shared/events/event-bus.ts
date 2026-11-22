@@ -2,6 +2,14 @@ import type { DomainEvents, EventEnvelope, EventName } from "@shared/events/even
 
 export type EventHandler<Name extends EventName> = (event: EventEnvelope<Name>) => void | Promise<void>;
 
+/**
+ * Cada inscrição é um objeto próprio (e não só a função): assim, assinar a MESMA função
+ * duas vezes gera duas entregas, e cancelar uma não cancela a outra.
+ */
+export type Subscription = {
+  handler: (event: EventEnvelope) => void | Promise<void>;
+};
+
 /** Cancela a inscrição; chamar mais de uma vez não gera erro. */
 export type Unsubscribe = () => Promise<void>;
 

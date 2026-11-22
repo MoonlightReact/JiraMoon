@@ -1,18 +1,10 @@
-import type { EventBus, EventHandler, Unsubscribe } from "@shared/events/event-bus.js";
+import type { EventBus, EventHandler, Subscription, Unsubscribe } from "@shared/events/event-bus.js";
 import {
   createEventEnvelope,
   type DomainEvents,
   type EventEnvelope,
   type EventName,
 } from "@shared/events/events.js";
-
-/**
- * Cada inscrição é um objeto próprio (e não só a função): assim, assinar a MESMA função
- * duas vezes gera duas entregas, e cancelar uma não cancela a outra.
- */
-type Subscription = {
-  handler: (event: EventEnvelope) => void | Promise<void>;
-};
 
 /**
  * Adaptador em memória da porta EventBus.
