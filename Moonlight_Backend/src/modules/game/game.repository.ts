@@ -1,13 +1,33 @@
 import type { Pool, PoolConnection, ResultSetHeader } from "mysql2/promise";
 import type { Game } from "@modules/game/game.repository.types.js";
-import type { GameCountRows, GameRow } from "@modules/game/game.row.js";
+import type { GameCountRows, GamePriceRow, GameRow } from "@modules/game/game.row.js";
 import pool from "@shared/config/database.js";
 import type { CreateGameDTO, UpdateGameDTO } from "@modules/game/dto/game.input.dto.js";
 import type { FilterParams, QueryOptions } from "@shared/types/pagination.js";
+import type { GamePrice, GamePriceReader } from "@modules/order/index.js";
 
-export class GameRepository{
+export class GameRepository implements GamePriceReader{
 
     constructor(private pool: Pool){}
+
+    // Leitura direta do MySQL, sem cache: o checkout precisa do preço real naquele instante.
+    // Só jogos ativos; ids inexistentes ou inativos não voltam no resultado.
+    async findPricesByIds(ids: number[]): Promise<GamePrice[]>{
+        if (ids.length === 0) return [];
+
+        const [rows] = await this.pool.query<GamePriceRow[]>(`
+            SELECT id_game, title, CAST(ROUND(price * 100) AS UNSIGNED) AS price_in_cents
+            FROM game
+            WHERE id_game IN (?)
+            AND active = 1
+        `, [ids]);
+
+        return rows.map(row => ({
+            id_game: Number(row.id_game),
+            title: row.title,
+            priceInCents: Number(row.price_in_cents)
+        }));
+    }
 
     async findAllPaginated({filters, pagination}: QueryOptions): Promise<Game[]>{
         const [rows] = await pool.query<GameRow[]>(`
