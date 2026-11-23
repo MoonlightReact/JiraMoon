@@ -83,7 +83,10 @@ export class RedisEventBus implements EventBus{
         throw err;
       }
     }
-    return async () => {
+    // unsubscribe é chamado se o último handler do canal for guardado e executado.
+    // const cancelar = await bus.subscribe("order.paid", handler1);
+    // await cancelar();
+    return async () : Promise<void> => {
       const emptied = this.removeSubscription(name, subscription);
       if (emptied) await this.subscriber.unsubscribe(name);
     }
