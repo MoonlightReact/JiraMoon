@@ -53,12 +53,15 @@ export class RedisEventBus implements EventBus{
 
   async publish<Name extends EventName>(name: Name, payload: DomainEvents[Name]): Promise<string> {
     const event = createEventEnvelope(name, payload);
-
-    // publish devolve quantos assinantes receberam. É a prova do at-most-once:
-    // receivers=0 significa que o evento não chegou a ninguém e foi descartado.
-    const receivers = await this.publisher.publish(name, JSON.stringify(event));
-
-    console.log(`[EventBus] PUBLISH ${name} id=${event.id_envelope} receivers=${receivers}`);
+    try {
+      // publish devolve quantos assinantes receberam. É a prova do at-most-once:
+      // receivers=0 significa que o evento não chegou a ninguém e foi descartado.
+      const receivers = await this.publisher.publish(name, JSON.stringify(event));
+      console.log(`[EventBus] PUBLISH ${name} id=${event.id_envelope} receivers=${receivers}`);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error(`[EventBus] ERROR PUBLISH de "${event.name}" falhou (id=${event.id_envelope}): ${message}`);
+    }
     return event.id_envelope;
   }
 
