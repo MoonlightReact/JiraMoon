@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from 'express';
 import type { CategoryService } from './category.service.js';
 import type { CreateCategoryDTO, UpdateCategoryDTO } from './dto/category.input.dto.js';
 import { AppError } from '@shared/errors/AppError.js';
-import { toInt } from '@shared/query/queryParser.js';
+import { toPositiveInt } from '@shared/query/queryParser.js';
 import { parseCategoriesQuery } from './category.parser.js';
 
 export class CategoryController{
@@ -36,7 +36,7 @@ export class CategoryController{
   // busca os jogos pelo seu id
   getCategoryById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const categoryId = toInt(req.params.id, 0);
+      const categoryId = toPositiveInt(req.params.id);
       if (!categoryId) throw new AppError("ID inválido", 400, "INVALID_ID");
 
       const category = await this.categoryService.findById(categoryId);
@@ -66,7 +66,7 @@ export class CategoryController{
     try {
       const dto = req.body as UpdateCategoryDTO;
 
-      const id_category = toInt(req.params.id, 0);
+      const id_category = toPositiveInt(req.params.id);
       if (!id_category) throw new AppError("ID inválido", 400, "INVALID_ID");
 
       const category = await this.categoryService.update({...dto, id_category});
@@ -81,7 +81,7 @@ export class CategoryController{
   // Deleta o jogo pelos comandos de (admin)
   deleteCategory = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const id_category = toInt(req.params.id, 0);
+      const id_category = toPositiveInt(req.params.id);
       if (!id_category) throw new AppError("ID inválido", 400, "INVALID_ID");
 
       const category = await this.categoryService.delete(id_category);

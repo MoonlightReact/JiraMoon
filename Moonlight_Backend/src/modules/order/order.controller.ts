@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from 'express';
 import type { OrderService } from '@modules/order/order.service.js';
 import type { CreateOrderDTO, UpdateOrderDTO } from '@modules/order/dto/order.input.dto.js';
 import { AppError } from '@shared/errors/AppError.js';
-import { toInt } from '@shared/query/queryParser.js';
+import { toPositiveInt } from '@shared/query/queryParser.js';
 
 
 export class OrderController{
@@ -35,7 +35,9 @@ export class OrderController{
 
       getOrderById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
           try {
-            const id_order = toInt(req.params.id, 0);
+            const id_order = toPositiveInt(req.params.id);
+            if (!id_order) throw new AppError("ID inválido", 400, "INVALID_ID");
+
             const order = await this.orderService.findOrderById(id_order);
             if (!order) throw new AppError("Pedido não encontrado", 404, "NOT_FOUND_ORDER");
 
@@ -61,7 +63,8 @@ export class OrderController{
       canUserPurchase = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
           try {
             const id_user = req.user!.id_user;
-            const id_game = toInt(req.query.id_game, 0);
+            const id_game = toPositiveInt(req.query.id_game);
+            if (!id_game) throw new AppError("ID inválido", 400, "INVALID_ID");
 
             const canPurchase = await this.orderService.canPurchaseGame(id_user, id_game)
             res.status(200).json({canPurchase})

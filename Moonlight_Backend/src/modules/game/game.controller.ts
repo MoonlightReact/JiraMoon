@@ -1,13 +1,11 @@
 import type { NextFunction, Request, Response } from "express";
-import pool from "@shared/config/database.js";
 import type { GameService } from "@modules/game/game.service.js";
-import type { ResultSetHeader } from "mysql2";
 import type {
   CreateGameDTO,
   UpdateGameDTO,
 } from "@modules/game/dto/game.input.dto.js";
 import { AppError } from "@shared/errors/AppError.js";
-import { toBoolean, toInt } from "@shared/query/queryParser.js";
+import { toBoolean, toPositiveInt } from "@shared/query/queryParser.js";
 import { parseGameQuery } from "@modules/game/game.parser.js";
 
 export class GameController {
@@ -22,12 +20,6 @@ export class GameController {
       const games = await this.gameService.findAllPaginated(
         parseGameQuery(req.query),
       );
-      if (!games)
-        throw new AppError(
-          "Jogos paginados não encontrados",
-          404,
-          "NOT_FOUND_GAMES_PAG",
-        );
 
       res.status(200).json(games);
     } catch (error) {
@@ -46,12 +38,6 @@ export class GameController {
         active: toBoolean(req.query.active),
         admin: true,
       });
-      if (!games)
-        throw new AppError(
-          "Jogos paginados não encontrados",
-          404,
-          "NOT_FOUND_GAMES_PAG_ADMIN",
-        );
 
       res.status(200).json(games);
     } catch (error) {
@@ -66,8 +52,6 @@ export class GameController {
   ): Promise<void> => {
     try {
       const games = await this.gameService.findAll();
-      if (!games)
-        throw new AppError("Jogos não encontrados", 404, "NOT_FOUND_GAMES");
 
       res.status(200).json(games);
     } catch (error) {
@@ -82,7 +66,7 @@ export class GameController {
     next: NextFunction,
   ): Promise<void> => {
     try {
-      const gameId = toInt(req.params.id, 0);
+      const gameId = toPositiveInt(req.params.id);
       if (!gameId) throw new AppError("ID inválido", 400, "ID_NOT_SENT_OR_INVALID");
 
       const game = await this.gameService.findById(gameId);
@@ -118,11 +102,9 @@ export class GameController {
     next: NextFunction,
   ): Promise<void> => {
     try {
-      const id_game = toInt(req.params.id, 0);
+      const id_game = toPositiveInt(req.params.id);
       if (!id_game) throw new AppError("ID inválido", 400, "ID_NOT_SENT_OR_INVALID");
       const dto = req.body as UpdateGameDTO;
-
-      await pool.query<ResultSetHeader>("SET @usuario_logado = ?", [req.user?.id_user,]); // Trigger de auditoria de preço dispara automaticamente no banco
 
       const game = await this.gameService.update({ ...dto, id_game });
       if (!game) throw new AppError("Jogo não encontrado", 404, "NOT_FOUND_GAME_TO_UPDATE");
@@ -140,7 +122,7 @@ export class GameController {
     next: NextFunction,
   ): Promise<void> => {
     try {
-      const id_game = toInt(req.params.id, 0);
+      const id_game = toPositiveInt(req.params.id);
       if (!id_game) throw new AppError("ID inválido", 400, "ID_NOT_SENT_OR_INVALID");
 
       const game = await this.gameService.delete(id_game);
