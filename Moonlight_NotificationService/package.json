@@ -1,0 +1,25 @@
+{
+  "name": "moonlight_notification_service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "start": "node dist/server.js",
+    "migrate": "tsx tools/migrate.ts"
+  },
+  "keywords": [],
+  "type": "module",
+  "dependencies": {
+    "dotenv": "^18.0.10",
+    "ioredis": "^6.1.0",
+    "mysql2": "^3.24.6",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "tsc-alias": "^1.9.10"
+  }
+}

@@ -11,6 +11,12 @@ x-db-env: &db-env
   DB_DATABASE_NAME: ${DB_DATABASE_NAME}
   DB_PASSWORD: ${DB_PASSWORD}
 
+x-notifications-db-env: &notifications-db-env
+  NOTIFICATIONS_DB_HOST: ${NOTIFICATIONS_DB_HOST}
+  NOTIFICATIONS_DB_USER: ${NOTIFICATIONS_DB_USER}
+  NOTIFICATIONS_DB_DATABASE_NAME: ${NOTIFICATIONS_DB_DATABASE_NAME}
+  NOTIFICATIONS_DB_PASSWORD: ${NOTIFICATIONS_DB_PASSWORD}
+
 services:
   redis:
     image: redis:7-alpine
@@ -21,6 +27,58 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+    networks: [db_network]
+
+  notifications_service:
+    build:
+      context: ./Moonlight_NotificationService
+      dockerfile: Dockerfile
+    container_name: notificationsService
+    restart: unless-stopped
+    environment:
+      <<: *notifications-db-env
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+    depends_on:
+      redis:
+        condition: service_healthy
+      migrate_notifications:
+        condition: service_completed_successfully
+      notifications_db:
+        condition: service_healthy
+    networks: [db_network]
+
+  notifications_db:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${NOTIFICATIONS_DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${NOTIFICATIONS_DB_DATABASE_NAME}
+      MYSQL_USER: ${NOTIFICATIONS_DB_USER}
+      MYSQL_PASSWORD: ${NOTIFICATIONS_DB_PASSWORD}
+    volumes:
+      - notifications-db-data:/var/lib/mysql
+    healthcheck:
+      # testa se o mysql ta realmente pronto para receber conexões
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [db_network]
+
+  migrate_notifications:
+    build:
+      context: ./Moonlight_NotificationService
+      dockerfile: Dockerfile
+      target: migrate
+    container_name: migrateNotificationService
+    restart: "no"
+    # Executa as migrations
+    command: sh -c 'npm run migrate'
+    environment:
+      <<: *notifications-db-env
+    depends_on:
+      notifications_db:
+        condition: service_healthy # Só começa quando o MySQL estiver saudável
     networks: [db_network]
 
   database:
@@ -121,3 +179,4 @@ networks:
 volumes:
   db-data:
   uploads-data:
+  notifications-db-data:
