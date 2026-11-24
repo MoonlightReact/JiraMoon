@@ -1,4 +1,4 @@
-import { jest } from "@jest/globals";
+import { afterEach, describe, expect, it, jest } from "@jest/globals";
 import EventEmitter from "node:events";
 import type { OrderPaidPayload } from "./order/order-payload.js";
 import { RedisEventBus } from "./redis-event-bus.js";
