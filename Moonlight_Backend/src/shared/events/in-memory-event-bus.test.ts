@@ -8,6 +8,7 @@ const createdPayload: OrderCreatedPayload = {
   id_user: 7,
   total: 89.98,
   external_reference: "order_123",
+  customer: { name: "João", email: "joao@email.com" }
 };
 
 const paidPayload: OrderPaidPayload = {

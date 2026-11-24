@@ -4,8 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const pool = mysql.createPool({
-  host: process.env.NOTIFICATIONS_DB_HOST || 'notifications_db',
-  port: Number(process.env.NOTIFICATIONS_DB_PORT || 3306),
+  host: process.env.NOTIFICATIONS_DB_HOST || 'localhost',
   user: process.env.NOTIFICATIONS_DB_USER || 'root',
   password: process.env.NOTIFICATIONS_DB_PASSWORD || '',
   database: process.env.NOTIFICATIONS_DB_DATABASE_NAME || 'notifications_db',
