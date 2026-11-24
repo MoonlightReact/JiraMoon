@@ -42,7 +42,7 @@ diretamente. Ele depende de uma interface `EventBus` (`publish`,
 nenhum service.
 
 **Envelope e contrato de entrega.** Todo evento trafega em um envelope
-`{ id_envelope, name, occurredAt, payload }`; o `id` é um UUID por evento.
+`{ id_envelope, name, occurredAt, payload }`; o `id_envelope` é um UUID por evento.
 Os dois adaptadores seguem o mesmo contrato:
 * cada evento chega a todos os assinantes ativos (fan-out);
 * entrega *at-most-once*, sem persistência e sem replay;
