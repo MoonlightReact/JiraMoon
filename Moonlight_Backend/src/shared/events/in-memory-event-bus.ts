@@ -54,7 +54,7 @@ export class InMemoryEventBus implements EventBus {
       await subscription.handler(event);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      console.error(`[EventBus] handler de "${event.name}" falhou (id=${event.id_envelope}): ${message}`);
+      console.error(`[EventBus] handler de "${event.eventName}" falhou (id=${event.id_envelope}): ${message}`);
     }
   }
 }

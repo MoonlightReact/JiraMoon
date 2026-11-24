@@ -34,7 +34,7 @@ export type Unsubscribe = () => Promise<void>;
  * o RedisEventBus resolve quando o Redis aceita a mensagem, sem saber se alguém consumiu.
  */
 export interface EventBus {
-  publish<Name extends EventName>(name: Name, payload: DomainEvents[Name]): Promise<string>;
-  subscribe<Name extends EventName>(name: Name, handler: EventHandler<Name>): Promise<Unsubscribe>;
+  publish<Name extends EventName>(eventName: Name, payload: DomainEvents[Name]): Promise<string>;
+  subscribe<Name extends EventName>(eventName: Name, handler: EventHandler<Name>): Promise<Unsubscribe>;
   close(): Promise<void>;
 }

@@ -23,6 +23,7 @@ export interface OrderPaidPayload {
   id_user: number;
   total: number;
   external_reference: string;
+  preference_id?: string;
   // Os dados do cliente viajam dentro do evento: o Notification Service tem banco
   // próprio e não precisa chamar a API principal para descobrir para quem enviar o e-mail.
   customer: { name: string; email: string };

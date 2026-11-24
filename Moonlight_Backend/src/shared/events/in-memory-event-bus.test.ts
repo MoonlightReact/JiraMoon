@@ -44,7 +44,7 @@ describe("InMemoryEventBus - Unitário", () => {
 
       expect(handler).toHaveBeenCalledTimes(1);
       const event = handler.mock.calls[0]![0];
-      expect(event.name).toBe("order.paid");
+      expect(event.eventName).toBe("order.paid");
       expect(event.payload).toEqual(paidPayload);
       expect(event.id_envelope).toMatch(UUID_V4);
       // ISO 8601: ida e volta pelo Date gera exatamente a mesma string

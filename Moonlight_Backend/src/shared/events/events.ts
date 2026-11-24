@@ -11,19 +11,19 @@ export type EventName = keyof DomainEvents;
 
 export interface EventEnvelope<Name extends EventName = EventName> {
   id_envelope: string;
-  name: Name;
+  eventName: Name;
   /** ISO 8601 para sobreviver a JSON.stringify/parse sem virar Date corrompido. */
   occurredAt: string;
   payload: DomainEvents[Name];
 }
 
 export function createEventEnvelope<Name extends EventName>(
-  name: Name,
+  eventName: Name,
   payload: DomainEvents[Name],
 ): EventEnvelope<Name> {
   return {
     id_envelope: randomUUID(),
-    name,
+    eventName,
     occurredAt: new Date().toISOString(),
     payload,
   };
