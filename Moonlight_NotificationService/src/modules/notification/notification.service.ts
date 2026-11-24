@@ -4,7 +4,7 @@ import type { NotificationRepository } from "./notification.repository.js";
 export class NotificationService {
   constructor(private notificationRepository: NotificationRepository) { }
 
-  async handleOrderPaid(event: EventEnvelope<"order.paid">) : Promise<void> {
+  async handleOrderEvent(event: EventEnvelope<"order.paid" | "order.created">) : Promise<void> {
     const { external_reference, customer } = event.payload;
     const ref = external_reference?.trim();
     const email = customer?.email?.trim();

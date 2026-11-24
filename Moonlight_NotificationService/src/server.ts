@@ -15,7 +15,9 @@ async function start(): Promise<void> {
   // Falha cedo: com o banco fora, o container cai e o Docker reinicia, em vez de ficar de pé e surdo.
   await pool.query("SELECT 1");
 
-  unsubscribe = await eventBus.subscribe("order.paid", event => notificationService.handleOrderPaid(event));
+  await eventBus.subscribe("order.created", event => notificationService.handleOrderEvent(event));
+  console.log("[NotificationService] pronto, assinando order.created");
+  unsubscribe = await eventBus.subscribe("order.paid", event => notificationService.handleOrderEvent(event));
   console.log("[NotificationService] pronto, assinando order.paid");
 }
 
