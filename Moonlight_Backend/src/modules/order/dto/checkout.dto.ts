@@ -1,8 +1,7 @@
-import type { CartItem } from "@shared/types/cartItem.js"
-
+// O cliente envia só os ids dos jogos.
+// Título, preço e total são calculados no servidor (CheckoutService).
 export type CreateCheckoutDTO = {
-    items: CartItem[],
-    total: number,
+    items: { id_game: number }[],
     user: {
         id_user: number,
         name: string

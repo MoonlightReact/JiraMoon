@@ -15,3 +15,9 @@ export type GameRow = RowDataPacket & {
 }
 
 export type GameCountRows = RowDataPacket & GameResponseCountRowsDTO;
+
+export type GamePriceRow = RowDataPacket & {
+    id_game: number;
+    title: string;
+    price_in_cents: number;
+}
