@@ -28,6 +28,16 @@ jobs:
       - name: Criar .env
         run: |
           printf '%s\n' \
+            "ORDERS_DB_ROOT_PASSWORD=${{ secrets.ORDERS_DB_ROOT_PASSWORD }}" \
+            "ORDERS_DB_HOST=${{ secrets.ORDERS_DB_HOST }}" \
+            "ORDERS_DB_USER=${{ secrets.ORDERS_DB_USER }}" \
+            "ORDERS_DB_PASSWORD=${{ secrets.ORDERS_DB_PASSWORD }}" \
+            "ORDERS_DB_DATABASE_NAME=${{ secrets.ORDERS_DB_DATABASE_NAME }}" \
+            "NOTIFICATIONS_DB_ROOT_PASSWORD=${{ secrets.NOTIFICATIONS_DB_ROOT_PASSWORD }}" \
+            "NOTIFICATIONS_DB_HOST=${{ secrets.NOTIFICATIONS_DB_HOST }}" \
+            "NOTIFICATIONS_DB_USER=${{ secrets.NOTIFICATIONS_DB_USER }}" \
+            "NOTIFICATIONS_DB_PASSWORD=${{ secrets.NOTIFICATIONS_DB_PASSWORD }}" \
+            "NOTIFICATIONS_DB_DATABASE_NAME=${{ secrets.NOTIFICATIONS_DB_DATABASE_NAME }}" \
             "DB_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" \
             "DB_HOST=${{ secrets.MYSQL_HOST }}" \
             "DB_USER=${{ secrets.MYSQL_USER }}" \
