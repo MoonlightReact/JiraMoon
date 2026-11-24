@@ -1,8 +1,5 @@
-import type { CartItem } from "@shared/types/cartItem.js";
-
 export interface CheckoutQueryPayload{
-  items: CartItem[];
-  total: number;
+  items: { id_game: number }[];
   user: {
     id_user: number,
     name: string

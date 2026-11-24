@@ -49,7 +49,7 @@ export const orderService         = new OrderService(orderRepository);
 export const categoryService      = new CategoryService(categoryRepository);
 export const purchasedItemsService = new PurchasedItemsService(purchasedItemsRepository);
 export const authService          = new AuthService(userRepository, userRoleRepository);
-export const checkoutService = new CheckoutService(orderService, purchasedItemsService);
+export const checkoutService = new CheckoutService(orderService, purchasedItemsService, gameRepository);
 
 export const uploadController   = new UploadController();
 export const userController     = new UserController(userService);

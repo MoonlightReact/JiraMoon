@@ -2,7 +2,7 @@ import type { UserService } from '@modules/user/user.service.js';
 import type { NextFunction, Request, Response } from 'express';
 import type { CreateUserDTO, RegisterUserDTO, UpdateMeDTO, UpdateUserDTO } from '@modules/user/dto/user.input.dto.js';
 import { AppError } from '@shared/errors/AppError.js';
-import { toInt } from '@shared/query/queryParser.js';
+import { toPositiveInt } from '@shared/query/queryParser.js';
 import { parseUserQuery } from '@modules/user/user.parser.js';
 
 
@@ -37,7 +37,7 @@ export class UserController{
 
   getUserById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const id_user = toInt(req.params.id, 0);
+      const id_user = toPositiveInt(req.params.id);
       if (!id_user) throw new AppError("ID não enviado", 400, "ID_NOT_SENT_OR_INVALID");
 
       const user = await this.userService.findById(id_user);
@@ -78,7 +78,7 @@ export class UserController{
     try {
       const dto = req.body as UpdateUserDTO;
 
-      const id_user = toInt(req.params.id, 0);
+      const id_user = toPositiveInt(req.params.id);
       if (!id_user) throw new AppError("ID não enviado", 400, "ID_NOT_SENT_OR_INVALID");
 
       const user = await this.userService.update({ ...dto, id_user });
@@ -109,7 +109,7 @@ export class UserController{
 
   deleteUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const id_user = toInt(req.params.id, 0);
+      const id_user = toPositiveInt(req.params.id);
       if (!id_user) throw new AppError("ID não enviado", 400, "ID_NOT_SENT_OR_INVALID");
 
       const user = await this.userService.delete(id_user);

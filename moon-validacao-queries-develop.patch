@@ -1,0 +1,431 @@
+diff --git a/Moonlight_Backend/src/modules/category/category.controller.ts b/Moonlight_Backend/src/modules/category/category.controller.ts
+index 3d277c9..3c6e4e6 100644
+--- a/Moonlight_Backend/src/modules/category/category.controller.ts
++++ b/Moonlight_Backend/src/modules/category/category.controller.ts
+@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from 'express';
+ import type { CategoryService } from './category.service.js';
+ import type { CreateCategoryDTO, UpdateCategoryDTO } from './dto/category.input.dto.js';
+ import { AppError } from '@shared/errors/AppError.js';
+-import { toInt } from '@shared/query/queryParser.js';
++import { toPositiveInt } from '@shared/query/queryParser.js';
+ import { parseCategoriesQuery } from './category.parser.js';
+ 
+ export class CategoryController{
+@@ -36,7 +36,7 @@ export class CategoryController{
+   // busca os jogos pelo seu id
+   getCategoryById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+     try {
+-      const categoryId = toInt(req.params.id, 0);
++      const categoryId = toPositiveInt(req.params.id);
+       if (!categoryId) throw new AppError("ID inválido", 400, "INVALID_ID");
+ 
+       const category = await this.categoryService.findById(categoryId);
+@@ -66,7 +66,7 @@ export class CategoryController{
+     try {
+       const dto = req.body as UpdateCategoryDTO;
+ 
+-      const id_category = toInt(req.params.id, 0);
++      const id_category = toPositiveInt(req.params.id);
+       if (!id_category) throw new AppError("ID inválido", 400, "INVALID_ID");
+ 
+       const category = await this.categoryService.update({...dto, id_category});
+@@ -81,7 +81,7 @@ export class CategoryController{
+   // Deleta o jogo pelos comandos de (admin)
+   deleteCategory = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+     try {
+-      const id_category = toInt(req.params.id, 0);
++      const id_category = toPositiveInt(req.params.id);
+       if (!id_category) throw new AppError("ID inválido", 400, "INVALID_ID");
+ 
+       const category = await this.categoryService.delete(id_category);
+diff --git a/Moonlight_Backend/src/modules/category/category.parser.ts b/Moonlight_Backend/src/modules/category/category.parser.ts
+index 0590fca..b391567 100644
+--- a/Moonlight_Backend/src/modules/category/category.parser.ts
++++ b/Moonlight_Backend/src/modules/category/category.parser.ts
+@@ -1,10 +1,10 @@
+ import type { Request } from "express";
+-import { toBoolean, toInt, toString } from "@shared/query/queryParser.js";
++import { toBoolean, toLimit, toPage, toString } from "@shared/query/queryParser.js";
+ import type { GetCategoriesPaginatedDTO } from "./dto/category.input.dto.js";
+ 
+ export const parseCategoriesQuery = (query: Request['query']): GetCategoriesPaginatedDTO => ({
+-    page: toInt(query.page, 1),
+-    limit: toInt(query.limit, 8),
++    page: toPage(query.page),
++    limit: toLimit(query.limit, 8),
+     random: toBoolean(query.random),
+     name: toString(query.name)
+ })
+diff --git a/Moonlight_Backend/src/modules/game/game.controller.ts b/Moonlight_Backend/src/modules/game/game.controller.ts
+index e2495ba..bc08061 100644
+--- a/Moonlight_Backend/src/modules/game/game.controller.ts
++++ b/Moonlight_Backend/src/modules/game/game.controller.ts
+@@ -1,13 +1,11 @@
+ import type { NextFunction, Request, Response } from "express";
+-import pool from "@shared/config/database.js";
+ import type { GameService } from "@modules/game/game.service.js";
+-import type { ResultSetHeader } from "mysql2";
+ import type {
+   CreateGameDTO,
+   UpdateGameDTO,
+ } from "@modules/game/dto/game.input.dto.js";
+ import { AppError } from "@shared/errors/AppError.js";
+-import { toBoolean, toInt } from "@shared/query/queryParser.js";
++import { toBoolean, toPositiveInt } from "@shared/query/queryParser.js";
+ import { parseGameQuery } from "@modules/game/game.parser.js";
+ 
+ export class GameController {
+@@ -22,12 +20,6 @@ export class GameController {
+       const games = await this.gameService.findAllPaginated(
+         parseGameQuery(req.query),
+       );
+-      if (!games)
+-        throw new AppError(
+-          "Jogos paginados não encontrados",
+-          404,
+-          "NOT_FOUND_GAMES_PAG",
+-        );
+ 
+       res.status(200).json(games);
+     } catch (error) {
+@@ -46,12 +38,6 @@ export class GameController {
+         active: toBoolean(req.query.active),
+         admin: true,
+       });
+-      if (!games)
+-        throw new AppError(
+-          "Jogos paginados não encontrados",
+-          404,
+-          "NOT_FOUND_GAMES_PAG_ADMIN",
+-        );
+ 
+       res.status(200).json(games);
+     } catch (error) {
+@@ -66,8 +52,6 @@ export class GameController {
+   ): Promise<void> => {
+     try {
+       const games = await this.gameService.findAll();
+-      if (!games)
+-        throw new AppError("Jogos não encontrados", 404, "NOT_FOUND_GAMES");
+ 
+       res.status(200).json(games);
+     } catch (error) {
+@@ -82,7 +66,7 @@ export class GameController {
+     next: NextFunction,
+   ): Promise<void> => {
+     try {
+-      const gameId = toInt(req.params.id, 0);
++      const gameId = toPositiveInt(req.params.id);
+       if (!gameId) throw new AppError("ID inválido", 400, "ID_NOT_SENT_OR_INVALID");
+ 
+       const game = await this.gameService.findById(gameId);
+@@ -118,12 +102,10 @@ export class GameController {
+     next: NextFunction,
+   ): Promise<void> => {
+     try {
+-      const id_game = toInt(req.params.id, 0);
++      const id_game = toPositiveInt(req.params.id);
+       if (!id_game) throw new AppError("ID inválido", 400, "ID_NOT_SENT_OR_INVALID");
+       const dto = req.body as UpdateGameDTO;
+ 
+-      await pool.query<ResultSetHeader>("SET @usuario_logado = ?", [req.user?.id_user,]); // Trigger de auditoria de preço dispara automaticamente no banco
+-
+       const game = await this.gameService.update({ ...dto, id_game });
+       if (!game) throw new AppError("Jogo não encontrado", 404, "NOT_FOUND_GAME_TO_UPDATE");
+ 
+@@ -140,7 +122,7 @@ export class GameController {
+     next: NextFunction,
+   ): Promise<void> => {
+     try {
+-      const id_game = toInt(req.params.id, 0);
++      const id_game = toPositiveInt(req.params.id);
+       if (!id_game) throw new AppError("ID inválido", 400, "ID_NOT_SENT_OR_INVALID");
+ 
+       const game = await this.gameService.delete(id_game);
+diff --git a/Moonlight_Backend/src/modules/game/game.parser.test.ts b/Moonlight_Backend/src/modules/game/game.parser.test.ts
+new file mode 100644
+index 0000000..7f8ae42
+--- /dev/null
++++ b/Moonlight_Backend/src/modules/game/game.parser.test.ts
+@@ -0,0 +1,28 @@
++import { parseGameQuery } from '@modules/game/game.parser.js';
++
++describe('parseGameQuery', () => {
++  it('usa page=1 e limit=8 por padrão', () => {
++    const result = parseGameQuery({});
++    expect(result.page).toBe(1);
++    expect(result.limit).toBe(8);
++  });
++
++  it('aceita page e limit válidos', () => {
++    const result = parseGameQuery({ page: '2', limit: '20' });
++    expect(result.page).toBe(2);
++    expect(result.limit).toBe(20);
++  });
++
++  it('limita limit=1000000000 ao teto de 50', () => {
++    const result = parseGameQuery({ limit: '1000000000' });
++    expect(result.limit).toBe(50);
++  });
++
++  it('volta ao padrão com page/limit inválidos ("1.5", "-5", "1e3", "abc", "")', () => {
++    for (const invalid of ['1.5', '-5', '1e3', 'abc', '']) {
++      const result = parseGameQuery({ page: invalid, limit: invalid });
++      expect(result.page).toBe(1);
++      expect(result.limit).toBe(8);
++    }
++  });
++});
+diff --git a/Moonlight_Backend/src/modules/game/game.parser.ts b/Moonlight_Backend/src/modules/game/game.parser.ts
+index 3f2737d..7c08a35 100644
+--- a/Moonlight_Backend/src/modules/game/game.parser.ts
++++ b/Moonlight_Backend/src/modules/game/game.parser.ts
+@@ -1,10 +1,10 @@
+ import type { Request } from "express";
+-import { toBoolean, toFloat, toInt, toString } from "@shared/query/queryParser.js";
++import { toBoolean, toFloat, toLimit, toPage, toString } from "@shared/query/queryParser.js";
+ import type { GetGamesPaginatedDTO } from "@modules/game/dto/game.input.dto.js";
+ 
+ export const parseGameQuery = (query: Request['query']): GetGamesPaginatedDTO => ({
+-    page: toInt(query.page, 1),
+-    limit: toInt(query.limit, 8),
++    page: toPage(query.page),
++    limit: toLimit(query.limit, 8),
+     random: toBoolean(query.random),
+     title: toString(query.title),
+     category: toString(query.category),
+diff --git a/Moonlight_Backend/src/modules/order/order.controller.ts b/Moonlight_Backend/src/modules/order/order.controller.ts
+index 26f8725..9d4807d 100644
+--- a/Moonlight_Backend/src/modules/order/order.controller.ts
++++ b/Moonlight_Backend/src/modules/order/order.controller.ts
+@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from 'express';
+ import type { OrderService } from '@modules/order/order.service.js';
+ import type { CreateOrderDTO, UpdateOrderDTO } from '@modules/order/dto/order.input.dto.js';
+ import { AppError } from '@shared/errors/AppError.js';
+-import { toInt } from '@shared/query/queryParser.js';
++import { toPositiveInt } from '@shared/query/queryParser.js';
+ 
+ 
+ export class OrderController{
+@@ -35,7 +35,9 @@ export class OrderController{
+ 
+       getOrderById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+           try {
+-            const id_order = toInt(req.params.id, 0);
++            const id_order = toPositiveInt(req.params.id);
++            if (!id_order) throw new AppError("ID inválido", 400, "INVALID_ID");
++
+             const order = await this.orderService.findOrderById(id_order);
+             if (!order) throw new AppError("Pedido não encontrado", 404, "NOT_FOUND_ORDER");
+ 
+@@ -61,7 +63,8 @@ export class OrderController{
+       canUserPurchase = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+           try {
+             const id_user = req.user!.id_user;
+-            const id_game = toInt(req.query.id_game, 0);
++            const id_game = toPositiveInt(req.query.id_game);
++            if (!id_game) throw new AppError("ID inválido", 400, "INVALID_ID");
+ 
+             const canPurchase = await this.orderService.canPurchaseGame(id_user, id_game)
+             res.status(200).json({canPurchase})
+diff --git a/Moonlight_Backend/src/modules/user/role/role.controller.ts b/Moonlight_Backend/src/modules/user/role/role.controller.ts
+index ccc018a..0a97d07 100644
+--- a/Moonlight_Backend/src/modules/user/role/role.controller.ts
++++ b/Moonlight_Backend/src/modules/user/role/role.controller.ts
+@@ -1,6 +1,6 @@
+ import type { Request, Response, NextFunction } from 'express';
+ import type { RoleService } from '@modules/user/role/role.service.js';
+-import { toInt } from '@shared/query/queryParser.js';
++import { toPositiveInt } from '@shared/query/queryParser.js';
+ import { AppError } from '@shared/errors/AppError.js';
+ 
+ export class RoleController {
+@@ -21,7 +21,8 @@ export class RoleController {
+ 
+   syncUserRoles = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+     try {
+-      const id_user = toInt(req.params.id, 0);
++      const id_user = toPositiveInt(req.params.id);
++      if (!id_user) throw new AppError("ID inválido", 400, "ID_NOT_SENT_OR_INVALID");
+       const { id_roles } = req.body as { id_roles: number[] }
+ 
+       await this.roleService.syncUserRoles(id_user, id_roles);
+diff --git a/Moonlight_Backend/src/modules/user/user.controller.ts b/Moonlight_Backend/src/modules/user/user.controller.ts
+index d1df07e..b57fca8 100644
+--- a/Moonlight_Backend/src/modules/user/user.controller.ts
++++ b/Moonlight_Backend/src/modules/user/user.controller.ts
+@@ -2,7 +2,7 @@ import type { UserService } from '@modules/user/user.service.js';
+ import type { NextFunction, Request, Response } from 'express';
+ import type { CreateUserDTO, RegisterUserDTO, UpdateMeDTO, UpdateUserDTO } from '@modules/user/dto/user.input.dto.js';
+ import { AppError } from '@shared/errors/AppError.js';
+-import { toInt } from '@shared/query/queryParser.js';
++import { toPositiveInt } from '@shared/query/queryParser.js';
+ import { parseUserQuery } from '@modules/user/user.parser.js';
+ 
+ 
+@@ -37,7 +37,7 @@ export class UserController{
+ 
+   getUserById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+     try {
+-      const id_user = toInt(req.params.id, 0);
++      const id_user = toPositiveInt(req.params.id);
+       if (!id_user) throw new AppError("ID não enviado", 400, "ID_NOT_SENT_OR_INVALID");
+ 
+       const user = await this.userService.findById(id_user);
+@@ -78,7 +78,7 @@ export class UserController{
+     try {
+       const dto = req.body as UpdateUserDTO;
+ 
+-      const id_user = toInt(req.params.id, 0);
++      const id_user = toPositiveInt(req.params.id);
+       if (!id_user) throw new AppError("ID não enviado", 400, "ID_NOT_SENT_OR_INVALID");
+ 
+       const user = await this.userService.update({ ...dto, id_user });
+@@ -109,7 +109,7 @@ export class UserController{
+ 
+   deleteUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+     try {
+-      const id_user = toInt(req.params.id, 0);
++      const id_user = toPositiveInt(req.params.id);
+       if (!id_user) throw new AppError("ID não enviado", 400, "ID_NOT_SENT_OR_INVALID");
+ 
+       const user = await this.userService.delete(id_user);
+diff --git a/Moonlight_Backend/src/modules/user/user.parser.ts b/Moonlight_Backend/src/modules/user/user.parser.ts
+index 73faebd..84d1778 100644
+--- a/Moonlight_Backend/src/modules/user/user.parser.ts
++++ b/Moonlight_Backend/src/modules/user/user.parser.ts
+@@ -1,10 +1,10 @@
+ import type { Request } from "express";
+-import { toInt, toString } from "@shared/query/queryParser.js";
++import { toLimit, toPage, toString } from "@shared/query/queryParser.js";
+ import type { GetUsersPaginatedDTO } from "@modules/user/dto/user.input.dto.js";
+ 
+ export const parseUserQuery = (query: Request['query']): GetUsersPaginatedDTO => ({
+-    page: toInt(query.page, 1),
+-    limit: toInt(query.limit, 10),
++    page: toPage(query.page),
++    limit: toLimit(query.limit, 10),
+     name: toString(query.name),
+     email: toString(query.email),
+     cpf: toString(query.cpf),
+diff --git a/Moonlight_Backend/src/shared/query/queryParser.test.ts b/Moonlight_Backend/src/shared/query/queryParser.test.ts
+new file mode 100644
+index 0000000..b67cdf7
+--- /dev/null
++++ b/Moonlight_Backend/src/shared/query/queryParser.test.ts
+@@ -0,0 +1,73 @@
++import { MAX_LIMIT, toLimit, toPage, toPositiveInt } from '@shared/query/queryParser.js';
++
++describe('toPositiveInt', () => {
++  it('aceita "7"', () => {
++    expect(toPositiveInt('7')).toBe(7);
++  });
++
++  it('recusa "1.5"', () => {
++    expect(toPositiveInt('1.5')).toBeUndefined();
++  });
++
++  it('recusa "-5"', () => {
++    expect(toPositiveInt('-5')).toBeUndefined();
++  });
++
++  it('recusa "1e3"', () => {
++    expect(toPositiveInt('1e3')).toBeUndefined();
++  });
++
++  it('recusa "abc"', () => {
++    expect(toPositiveInt('abc')).toBeUndefined();
++  });
++
++  it('recusa string vazia', () => {
++    expect(toPositiveInt('')).toBeUndefined();
++  });
++
++  it('recusa "0"', () => {
++    expect(toPositiveInt('0')).toBeUndefined();
++  });
++
++  it('recusa número fora do range seguro', () => {
++    expect(toPositiveInt('99999999999999999999')).toBeUndefined();
++  });
++
++  it('recusa valores que não são string (undefined, número, array)', () => {
++    expect(toPositiveInt(undefined)).toBeUndefined();
++    expect(toPositiveInt(7)).toBeUndefined();
++    expect(toPositiveInt(['7'])).toBeUndefined();
++  });
++});
++
++describe('toPage', () => {
++  it('usa o valor enviado quando válido', () => {
++    expect(toPage('3')).toBe(3);
++  });
++
++  it('volta para 1 quando inválido', () => {
++    expect(toPage('abc')).toBe(1);
++    expect(toPage('-1')).toBe(1);
++    expect(toPage(undefined)).toBe(1);
++  });
++});
++
++describe('toLimit', () => {
++  it('usa o valor enviado quando válido e dentro do teto', () => {
++    expect(toLimit('20', 8)).toBe(20);
++  });
++
++  it('volta para o padrão quando inválido', () => {
++    expect(toLimit('abc', 8)).toBe(8);
++    expect(toLimit('1.5', 8)).toBe(8);
++    expect(toLimit(undefined, 8)).toBe(8);
++  });
++
++  it('limita ao teto quando limit=1000000000', () => {
++    expect(toLimit('1000000000', 8)).toBe(MAX_LIMIT);
++  });
++
++  it('o teto padrão é 50', () => {
++    expect(MAX_LIMIT).toBe(50);
++  });
++});
+diff --git a/Moonlight_Backend/src/shared/query/queryParser.ts b/Moonlight_Backend/src/shared/query/queryParser.ts
+index dcb49a6..fd0293a 100644
+--- a/Moonlight_Backend/src/shared/query/queryParser.ts
++++ b/Moonlight_Backend/src/shared/query/queryParser.ts
+@@ -1,14 +1,28 @@
++// Teto de itens por página: protege o banco contra limit absurdo (ex.: limit=1000000000)
++export const MAX_LIMIT = 50;
++
+ export const toString = (value: unknown): string | undefined => {
+   if (typeof value !== 'string') return undefined;
+   const trimmed = value.trim();
+   return trimmed === '' ? undefined : trimmed;
+ }
+ 
+-export const toInt = (value: unknown, defaultValue: number): number => {
++// Aceita só string de dígitos ("7"). Recusa "1.5", "-5", "1e3", "abc", "", "0" e números fora do range seguro.
++export const toPositiveInt = (value: unknown): number | undefined => {
++  if (typeof value !== 'string') return undefined;
++  if (!/^\d+$/.test(value)) return undefined;
+   const num = Number(value);
+-  return Number.isFinite(num) ? num : defaultValue;
++  return Number.isSafeInteger(num) && num > 0 ? num : undefined;
+ }
+ 
++// Página inválida volta para o valor padrão
++export const toPage = (value: unknown, defaultValue = 1): number =>
++  toPositiveInt(value) ?? defaultValue;
++
++// Limite inválido volta para o padrão; limite acima do teto é reduzido para o teto
++export const toLimit = (value: unknown, defaultValue: number, max = MAX_LIMIT): number =>
++  Math.min(toPositiveInt(value) ?? defaultValue, max);
++
+ export const toBoolean = (value: unknown): boolean | undefined => {
+   if (value === undefined) return undefined;
+   return value === 'true';
+@@ -17,4 +31,4 @@ export const toBoolean = (value: unknown): boolean | undefined => {
+ export const toFloat = (value: unknown): number | undefined => {
+   const parsed = parseFloat(value as string);
+   return isNaN(parsed) ? undefined : parsed
+-}
+\ No newline at end of file
++}

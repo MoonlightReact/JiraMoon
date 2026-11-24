@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import type { RoleService } from '@modules/user/role/role.service.js';
-import { toInt } from '@shared/query/queryParser.js';
+import { toPositiveInt } from '@shared/query/queryParser.js';
 import { AppError } from '@shared/errors/AppError.js';
 
 export class RoleController {
@@ -21,7 +21,8 @@ export class RoleController {
 
   syncUserRoles = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const id_user = toInt(req.params.id, 0);
+      const id_user = toPositiveInt(req.params.id);
+      if (!id_user) throw new AppError("ID inválido", 400, "ID_NOT_SENT_OR_INVALID");
       const { id_roles } = req.body as { id_roles: number[] }
 
       await this.roleService.syncUserRoles(id_user, id_roles);

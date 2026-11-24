@@ -12,30 +12,42 @@ beforeAll(async () => {
 
 describe("Checkout Controller", () => {
   describe("POST /api/checkout/", () => {
-    it("deve retornar 400 se o usuário já possui o jogo", async () => {
+    it("deve retornar 200 ou 400 se o usuário já possui o jogo", async () => {
       const res = await request(app)
         .post("/api/checkout/")
         .set("Authorization", `Bearer ${userToken}`)
         .send({
-          items: [{ id_game: 3, title: "Jogo Existente", price: 59.99 }],
-          total: 59.99,
-          user: { id_user: 1, name: "Admin", email: "dominic@familia.com" },
+          items: [{ id_game: 3 }],
+          user: { id_user: 1, name: "Admin" },
         });
 
       expect([200, 400]).toContain(res.statusCode);
     });
 
-    it("deve retornar 200 ou 500 para checkout válido (MP pode não estar configurado)", async () => {
+    it("deve retornar 404 se o jogo não existir ou estiver inativo", async () => {
       const res = await request(app)
         .post("/api/checkout/")
         .set("Authorization", `Bearer ${userToken}`)
         .send({
-          items: [{ id_game: 999999, title: "Jogo Novo", price: 29.99 }],
-          total: 29.99,
-          user: { id_user: 1, name: "carlinhos", email: "carlinhos@email.com" },
+          items: [{ id_game: 999999 }],
+          user: { id_user: 1, name: "carlinhos" },
         });
 
-      expect([200, 500]).toContain(res.statusCode);
+      expect(res.statusCode).toBe(404);
+      expect(res.body.code).toBe("GAME_NOT_FOUND");
+    });
+
+    it("deve retornar 400 se o carrinho estiver vazio", async () => {
+      const res = await request(app)
+        .post("/api/checkout/")
+        .set("Authorization", `Bearer ${userToken}`)
+        .send({
+          items: [],
+          user: { id_user: 1, name: "carlinhos" },
+        });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.code).toBe("EMPTY_CART");
     });
   });
 

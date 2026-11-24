@@ -3,6 +3,8 @@ import { OrderService } from "@modules/order/order.service.js";
 import { PurchasedItemsService } from "@modules/order/purchased-items.service.js";
 import type { CreateCheckoutDTO } from "@modules/order/dto/checkout.dto.js";
 import type { PurchasedItemsDTO } from "@modules/order/dto/purchased-items.dto.js";
+import type { CartItem } from "@shared/types/cartItem.js";
+import type { GamePrice, GamePriceReader } from "@modules/order/game-price.reader.js";
 import { AppError } from "@shared/errors/AppError.js";
 type PaymentStatus = 'approved' | 'pending' | 'canceled';
 
@@ -10,14 +12,18 @@ export class CheckoutService{
 
     constructor(
         private orderService: OrderService,
-        private purchasedItemsService: PurchasedItemsService
+        private purchasedItemsService: PurchasedItemsService,
+        private gamePriceReader: GamePriceReader
     ) {}
 
         async createPreference(dto: CreateCheckoutDTO): Promise<{
             preference_id: string | undefined;
             checkout_url: string | undefined;
         }>{
-            for (const item of dto.items) {
+            // O cliente só manda os ids: título, preço e total vêm do servidor.
+            const { items, total } = await this.priceCart(dto.items);
+
+            for (const item of items) {
                 const canBuy = await this.orderService.canPurchaseGame(dto.user.id_user, item.id_game);
                 if (!canBuy) throw new AppError(`Você já possui o jogo "${item.title}" na sua biblioteca.`, 400, "USER_ALREADY_HAVE_GAME");
             }
@@ -27,11 +33,11 @@ export class CheckoutService{
 
             const external_reference = this.generateExternalReference();
 
-            const preference = await this.createMercadoPreference(preferenceClient, dto, external_reference);
+            const preference = await this.createMercadoPreference(preferenceClient, dto.user, items, external_reference);
 
-            const id_order = await this.createOrder(dto, preference.id!, external_reference);
+            const id_order = await this.createOrder(dto.user.id_user, total, preference.id!, external_reference);
 
-            await this.createPurchasedItems({id_order, items: dto.items} as PurchasedItemsDTO);
+            await this.createPurchasedItems({id_order, items});
 
             return { preference_id: preference.id, checkout_url: preference.init_point ?? preference.sandbox_init_point};
         }
@@ -49,6 +55,38 @@ export class CheckoutService{
             await this.orderService.updateOrderStatus({status, external_reference})
         }
 
+        // Monta o carrinho com os dados reais do banco. O total é somado em centavos (inteiros)
+        // para evitar erro de ponto flutuante (0.1 + 0.2 !== 0.3).
+        private async priceCart(requested: CreateCheckoutDTO["items"] | undefined): Promise<{ items: CartItem[]; total: number }> {
+            if (!Array.isArray(requested) || requested.length === 0) {
+                throw new AppError("O carrinho está vazio.", 400, "EMPTY_CART");
+            }
+
+            // ids repetidos viram um só
+            const ids = [...new Set(requested.map(item => Number(item?.id_game)))];
+
+            if (ids.some(id => !Number.isInteger(id) || id <= 0)) {
+                throw new AppError("Id de jogo inválido no carrinho.", 400, "INVALID_GAME_ID");
+            }
+
+            const found = await this.gamePriceReader.findPricesByIds(ids);
+            const byId = new Map(found.map(game => [game.id_game, game]));
+
+            const games: GamePrice[] = [];
+            for (const id of ids) {
+                const game = byId.get(id);
+                if (!game) throw new AppError("Um ou mais jogos do carrinho não existem ou estão indisponíveis.", 404, "GAME_NOT_FOUND");
+                games.push(game);
+            }
+
+            const totalInCents = games.reduce((sum, game) => sum + game.priceInCents, 0);
+
+            return {
+                items: games.map(game => ({ id_game: game.id_game, title: game.title, price: game.priceInCents / 100 })),
+                total: totalInCents / 100
+            };
+        }
+
         private createMercadoPagoClient(): MercadoPagoConfig {
             return new MercadoPagoConfig({
                 accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN!
@@ -61,16 +99,17 @@ export class CheckoutService{
 
         private async createMercadoPreference(
             preference: Preference,
-            query: CreateCheckoutDTO,
+            user: CreateCheckoutDTO["user"],
+            items: CartItem[],
             external_reference: string
         ) {
             return preference.create({
                 body: {
                     payer: {
-                        name: query.user.name,
+                        name: user.name,
                         email: "TESTUSER8052695651117258427@testuser.com"
                     },
-                    items: query.items.map(item => ({
+                    items: items.map(item => ({
                         id: String(item.id_game),
                         title: item.title,
                         quantity: 1,
@@ -90,7 +129,8 @@ export class CheckoutService{
         }
 
         private async createOrder(
-            query: CreateCheckoutDTO,
+            id_user: number,
+            total: number,
             preference_id: string,
             external_reference: string
         ): Promise<number> {
@@ -98,8 +138,8 @@ export class CheckoutService{
                 status: 'pending',
                 preference_id,
                 external_reference,
-                id_user: query.user.id_user,
-                total: query.total
+                id_user,
+                total
             });
         }
 

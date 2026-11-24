@@ -47,9 +47,9 @@ export function AboutUs() {
                 Marcos Vinicius da Silva Inglez:
               </h3>
               <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem ipsum veritatis facilis velit corrupti. Placeat distinctio sit omnis obcaecati? Repudiandae sed dolor exercitationem eos molestias ex aut minus assumenda consectetur!<br></br>
+                Sou estudante de ADS apaixonado por desenvolvimento de software.<br></br>
                 <br></br>
-                lorem<br></br>
+                Tenho experiência prática com desenvolvimento back-end e front-end<br></br>
                 <br></br>
                 lorem<br></br>
                 <br></br>
@@ -59,7 +59,7 @@ export function AboutUs() {
               </p>
             </div>
             <div className="[grid-area:botao] flex justify-around">
-              <Button className="p-2 rounded-md w-fit flex items-center" variant="cta" as="link" href="https://github.com/Foxsa-Crypto">
+              <Button className="p-2 rounded-md w-fit flex items-center" variant="cta" as="link" href="https://github.com/Marcos-Guaxinim/Marcos-Guaxinim">
                 <span><GithubLogoIcon size={32} weight="thin" /></span>
                 Conheça meu Github
               </Button>
